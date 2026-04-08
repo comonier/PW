@@ -1,0 +1,42 @@
+name: PW
+version: '${project.version}'
+main: com.comonier.plugin.PW
+api-version: 1.19
+author: Comonier
+description: Sistema de Player Warps dinâmico com suporte a GUI e Bedrock.
+depend: [Vault]
+commands:
+  pw:
+    description: Comando principal do Player Warps.
+    aliases: [pwarp, playerwarp]
+    permission: pw.use
+  pwedit:
+    description: Abre o menu de edição da sua warp.
+    permission: pw.edit
+  pweditplayer:
+    description: Administradores editam warps de outros jogadores.
+    permission: pw.admin
+  pwsetname:
+    description: Altera o nome de uma warp.
+  pwsetlore:
+    description: Altera a lore de uma warp.
+  pwseticon:
+    description: Altera o ícone de uma warp.
+  pwdel:
+    description: Remove uma warp.
+  pwreset:
+    description: Redefine a localização de uma warp.
+
+permissions:
+  pw.use:
+    description: Permissão padrão para usar o sistema e abrir o menu.
+    default: true
+  pw.admin:
+    description: Permissão total de administrador.
+    default: op
+  pw.edit:
+    description: Permissão para editar as próprias warps.
+    default: true
+  pw.tp:
+    description: Permissão para se teleportar para warps.
+    default: true

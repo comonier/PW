@@ -1,0 +1,36 @@
+# Русские сообщения
+messages:
+  prefix: "&b&lPW &8» "
+  no-permission: "&cУ вас нет разрешения: {permission} или pw.use."
+  permission-denied-admin: "&cРазрешение {permission} было отклонено администратором."
+  warp-not-found: "&cВарп не найден."
+  
+  edit-name-tutorial:
+    - "&eL1: Чтобы изменить название варпа, введите команду:"
+    - "&eL2: &b/pwsetname <старое_имя> <новое_имя>"
+    - "&eL5: &8Разрешение: pw.setname"
+  
+  edit-lore-tutorial:
+    - "&eL1: Чтобы изменить описание, введите команду:"
+    - "&eL2: &b/pwsetlore <имя_варпа> <текст>"
+    - "&eL4: &7Вы можете использовать , или ; для новых строк"
+    - "&eL5: &8Разрешение: pw.setlore"
+
+  edit-icon-tutorial:
+    - "&eL1: Чтобы изменить иконку, введите команду:"
+    - "&eL2: &b/pwseticon <имя_варпа> &7держа предмет в руке"
+    - "&eL3: &8Разрешение: pw.seticon"
+
+  edit-remove-tutorial:
+    - "&eL1: Чтобы удалить варп, введите команду:"
+    - "&eL2: &c/pwdel <имя_варпа> confirm"
+    - "&eL3: &8Разрешение: pw.del"
+
+  success:
+    name-changed: "&aНазвание варпа успешно изменено."
+    lore-changed: "&aОписание успешно изменено."
+    icon-changed: "&aИконка успешно изменена."
+    location-reset: "&aТочка варпа успешно обновлена."
+    warp-removed: "&aВарп успешно удален."
+    warp-locked: "&cВарп заблокирован."
+    warp-unlocked: "&aВарп разблокирован."

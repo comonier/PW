@@ -1,0 +1,40 @@
+# Mensagens em Português
+messages:
+  prefix: "&b&lPW &8» "
+  no-permission: "&cVocê não possui a permissão: {permission} ou pw.use para usar este comando."
+  permission-denied-admin: "&cA permissão {permission} foi negada pelo Administrador."
+  warp-not-found: "&cWarp não encontrada."
+  
+  # Tutorial messages for Edit Menu clicks
+  edit-name-tutorial:
+    - "&eL1: Para trocar o nome da warp digite o comando abaixo:"
+    - "&eL2: &b/pwsetname <old_warpname> <new_warpname>"
+    - "&eL3: &7old_warpname é o nome atual da warp"
+    - "&eL4: &7new_warpname é o novo nome da warp"
+    - "&eL5: &8Permissão: pw.setname"
+  
+  edit-lore-tutorial:
+    - "&eL1: Para trocar a lore da warp digite o comando abaixo:"
+    - "&eL2: &b/pwsetlore <warp_name> <mensagem formatada>"
+    - "&eL3: &7Você pode usar formatação de cor, exemplo: &7/pw &bxp"
+    - "&eL4: &7Você pode configurar outras linhas usando , ou ;"
+    - "&eL5: &8Permissão: pw.setlore"
+
+  edit-icon-tutorial:
+    - "&eL1: Para trocar o icone da warp digite o comando abaixo:"
+    - "&eL2: &b/pwseticon <warp_name> &7segurando um item na mão"
+    - "&eL3: &8Permissão: pw.seticon"
+
+  edit-remove-tutorial:
+    - "&eL1: Para remover sua warp digite o comando abaixo:"
+    - "&eL2: &c/pwdel <warp_name> confirm"
+    - "&eL3: &8Permissão: pw.del"
+
+  success:
+    name-changed: "&aNome da warp alterado com sucesso."
+    lore-changed: "&aLore alterada com sucesso."
+    icon-changed: "&aÍcone alterado com sucesso."
+    location-reset: "&aLocalização da warp redefinida com sucesso."
+    warp-removed: "&aWarp removida com sucesso."
+    warp-locked: "&cWarp trancada com sucesso."
+    warp-unlocked: "&aWarp destrancada com sucesso."
