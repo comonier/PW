@@ -15,7 +15,7 @@ import java.util.*;
 
 /*
  * Handles SQLite and MySQL persistence.
- * Fixed: Visit loading logic and connection stability.
+ * Updated: Now persists both clean ID and colorized DisplayName.
  */
 public class DatabaseManager {
 
@@ -71,8 +71,8 @@ public class DatabaseManager {
         String sql = "REPLACE INTO pw_warps (name_id, display_name, owner_uuid, owner_name, world, x, y, z, yaw, pitch, icon, lore, visits, created_at, locked) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, warp.getName().toLowerCase());
-            pstmt.setString(2, warp.getName());
+            pstmt.setString(1, warp.getId()); // Internal search ID
+            pstmt.setString(2, warp.getDisplayName()); // Visual name with & codes
             pstmt.setString(3, warp.getOwnerUUID().toString());
             pstmt.setString(4, warp.getOwnerName());
             pstmt.setString(5, warp.getLocation().getWorld().getName());
@@ -92,10 +92,10 @@ public class DatabaseManager {
         }
     }
 
-    public void deleteWarp(String name) {
+    public void deleteWarp(String nameId) {
         String sql = "DELETE FROM pw_warps WHERE name_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, name.toLowerCase());
+            pstmt.setString(1, nameId.toLowerCase());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -107,30 +107,41 @@ public class DatabaseManager {
         String sql = "SELECT * FROM pw_warps";
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
+                String worldName = rs.getString("world");
+                if (Bukkit.getWorld(worldName) == null) continue;
+
                 Location loc = new Location(
-                        Bukkit.getWorld(rs.getString("world")),
+                        Bukkit.getWorld(worldName),
                         rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"),
                         rs.getFloat("yaw"), rs.getFloat("pitch")
                 );
-                Warp warp = new Warp(rs.getString("display_name"), 
-                                     UUID.fromString(rs.getString("owner_uuid")),
-                                     rs.getString("owner_name"), loc, 
-                                     deserializeItem(rs.getString("icon")));
+
+                // Reconstruct Warp using the ID from database
+                Warp warp = new Warp(
+                        rs.getString("name_id"), 
+                        UUID.fromString(rs.getString("owner_uuid")),
+                        rs.getString("owner_name"), 
+                        loc, 
+                        deserializeItem(rs.getString("icon"))
+                );
                 
+                // Restore the visual display name
+                warp.setDisplayName(rs.getString("display_name"));
                 warp.setLocked(rs.getBoolean("locked"));
+                
                 String loreRaw = rs.getString("lore");
                 if (loreRaw != null && loreRaw.length() > 0) {
                     warp.setLore(new ArrayList<>(Arrays.asList(loreRaw.split(";"))));
                 }
 
-                // Visit fix using reverse logic to avoid < symbol
+                // Restore visits count accurately using while loop
                 int targetVisits = rs.getInt("visits");
                 while (targetVisits > 0) {
                     warp.addVisit();
                     targetVisits--;
                 }
 
-                map.put(rs.getString("name_id"), warp);
+                map.put(warp.getId(), warp);
             }
         } catch (SQLException e) {
             e.printStackTrace();

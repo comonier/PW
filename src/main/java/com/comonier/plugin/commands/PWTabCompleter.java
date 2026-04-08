@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- * Dynamic Tab Completer with null-safety and syntax guarding.
+ * Fixed Tab Completer.
+ * Strips color codes from suggestions to prevent "Illegal Characters" disconnect.
  */
 public class PWTabCompleter implements TabCompleter {
 
@@ -26,24 +27,22 @@ public class PWTabCompleter implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        // Guard against empty args or nulls to prevent console errors
         if (args == null || args.length == 0) return Collections.emptyList();
 
         List<String> completions = new ArrayList<>();
         String cmdName = command.getName().toLowerCase();
         String currentArg = args[args.length - 1].toLowerCase();
 
-        // List of commands that suggest warp names as the first argument
         List<String> warpCommands = Arrays.asList("pw", "pwedit", "pweditplayer", "pwsetname", "pwsetlore", "pwseticon", "pwdel", "pwreset");
 
         if (warpCommands.contains(cmdName) && args.length == 1) {
             completions.addAll(plugin.getWarpManager().getWarps().stream()
-                    .map(Warp::getName)
+                    // NEW: Strip color codes from the name before suggesting it in chat
+                    .map(w -> w.getName().replaceAll("(?i)&[0-9A-FK-OR]", ""))
                     .filter(name -> name.toLowerCase().startsWith(currentArg))
                     .collect(Collectors.toList()));
         }
 
-        // Specific guard for /pwdel confirmation
         if (cmdName.equals("pwdel") && args.length == 2) {
             if ("confirm".startsWith(currentArg)) completions.add("confirm");
         }

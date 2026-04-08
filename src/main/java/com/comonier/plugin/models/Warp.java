@@ -1,5 +1,6 @@
 package com.comonier.plugin.models;
 
+import com.comonier.plugin.utils.PWUtils;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
@@ -8,12 +9,13 @@ import java.util.UUID;
 
 /*
  * Represents a Player Warp in the system.
- * Stores location, owner, statistics and visual information.
+ * This class separates the internal ID (used for commands and database) 
+ * from the Display Name (which supports color codes for the GUI).
  */
 public class Warp {
 
-    private final String id; // Unique ID for storage
-    private String name;
+    private final String id; // Clean name used as key in database and maps
+    private String displayName; // Name with & color codes for visual display
     private final UUID ownerUUID;
     private final String ownerName;
     private Location location;
@@ -23,9 +25,9 @@ public class Warp {
     private final long createdAt;
     private boolean locked;
 
-    public Warp(String name, UUID ownerUUID, String ownerName, Location location, ItemStack icon) {
-        this.id = UUID.randomUUID().toString();
-        this.name = name;
+    public Warp(String id, UUID ownerUUID, String ownerName, Location location, ItemStack icon) {
+        this.id = id.toLowerCase();
+        this.displayName = id; // Default display name is the ID itself
         this.ownerUUID = ownerUUID;
         this.ownerName = ownerName;
         this.location = location;
@@ -41,12 +43,22 @@ public class Warp {
         return id;
     }
 
+    /*
+     * Returns the name with processed color codes for GUI display.
+     */
     public String getName() {
-        return name;
+        return PWUtils.color(displayName);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /*
+     * Returns the raw display name with '&' codes for database saving.
+     */
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public UUID getOwnerUUID() {

@@ -5,6 +5,7 @@ import com.comonier.plugin.managers.WarpManager;
 import com.comonier.plugin.managers.ProtectionManager;
 import com.comonier.plugin.models.Warp;
 import com.comonier.plugin.utils.DiscordWebhook;
+import com.comonier.plugin.utils.PWUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * Handles attribute modification commands with syntax guarding and full message migration.
- * Commands: /pwsetname, /pwsetlore, /pwseticon, /pwdel, /pwreset.
+ * Handles attribute modification commands with syntax guarding.
+ * Fixed: pwsetname now only updates the visual display name, preserving the internal ID.
  */
 public class PWAttributeCommands implements CommandExecutor {
 
@@ -41,10 +42,11 @@ public class PWAttributeCommands implements CommandExecutor {
 
         // Syntax Guard to prevent ArrayIndexOutOfBoundsException
         if (args == null || args.length == 0) {
-            player.sendMessage("§cArgumento incompleto! Use: /" + label + " <nome_da_warp>");
+            player.sendMessage("§cArgumento incompleto! Use: /" + label + " <warp>");
             return true;
         }
 
+        // Always search using the clean ID (args[0])
         Warp warp = warpManager.getWarp(args[0]);
         if (warp == null) {
             player.sendMessage(plugin.getMessage("warp-not-found"));
@@ -63,15 +65,13 @@ public class PWAttributeCommands implements CommandExecutor {
             case "pwsetname":
                 if (!checkPerm(player, "pw.setname")) return true;
                 if (args.length > 1) {
-                    String oldName = warp.getName();
-                    String newName = args[1];
-                    warpManager.deleteWarp(oldName);
-                    warp.setName(newName);
-                    warpManager.createWarp(warp);
+                    // Update only the visual name. The internal ID (warp.getId()) remains the same.
+                    warp.setDisplayName(args[1]);
+                    warpManager.saveWarp(warp);
                     player.sendMessage(plugin.getMessage("success.name-changed"));
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                 } else {
-                    player.sendMessage("§cUse: /pwsetname " + warp.getName() + " <novo_nome>");
+                    player.sendMessage("§cUse: /pwsetname " + warp.getId() + " <novo_nome>");
                 }
                 break;
 
@@ -86,14 +86,14 @@ public class PWAttributeCommands implements CommandExecutor {
                     String[] lines = rawLore.split("[,;]");
                     List<String> formattedLore = new ArrayList<>();
                     for (String line : lines) {
-                        formattedLore.add(line.trim().replace("&", "§"));
+                        formattedLore.add(PWUtils.color(line.trim()));
                     }
                     warp.setLore(formattedLore);
                     warpManager.saveWarp(warp);
                     player.sendMessage(plugin.getMessage("success.lore-changed"));
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                 } else {
-                    player.sendMessage("§cUse: /pwsetlore " + warp.getName() + " <descrição>");
+                    player.sendMessage("§cUse: /pwsetlore " + warp.getId() + " <descrição>");
                 }
                 break;
 
@@ -130,36 +130,26 @@ public class PWAttributeCommands implements CommandExecutor {
             case "pwdel":
                 if (!checkPerm(player, "pw.del")) return true;
                 if (args.length > 1 && args[1].equalsIgnoreCase("confirm")) {
-                    String warpName = warp.getName();
-                    warpManager.deleteWarp(warpName);
+                    String warpId = warp.getId();
+                    warpManager.deleteWarp(warpId);
                     player.sendMessage(plugin.getMessage("warp-deleted"));
                     player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1f, 1f);
 
                     if (plugin.getConfig().getBoolean("announcements.global-chat")) {
                         Bukkit.broadcastMessage(plugin.getMessage("broadcast-delete")
                                 .replace("{player}", player.getName())
-                                .replace("{warp}", warpName));
-                    }
-                    if (plugin.getConfig().getBoolean("announcements.discord.enabled")) {
-                        sendDiscordNotice("Warp Deletada", "O jogador **" + player.getName() + "** deletou a warp: **" + warpName + "**", 16711680);
+                                .replace("{warp}", warpId));
                     }
                 } else {
-                    player.sendMessage("§cUse: /pwdel " + warp.getName() + " confirm");
+                    player.sendMessage("§cUse: /pwdel " + warp.getId() + " confirm");
                 }
                 break;
         }
         return true;
     }
 
-    private void sendDiscordNotice(String title, String desc, int color) {
-        String url = plugin.getConfig().getString("announcements.discord.webhook-url");
-        if (url == null || url.isEmpty() || url.contains("your-link-here")) return;
-        String json = "{\"username\":\"" + plugin.getConfig().getString("announcements.discord.username") + "\",\"embeds\":[{\"title\":\"" + title + "\",\"description\":\"" + desc + "\",\"color\":" + color + "}]}";
-        DiscordWebhook.send(url, json);
-    }
-
     private boolean checkPerm(Player p, String perm) {
-        if (p.hasPermission(perm) || p.hasPermission("pw.use") || p.hasPermission("pw.admin")) return true;
+        if (p.hasPermission(perm) || p.hasPermission("pw.admin")) return true;
         p.sendMessage(plugin.getMessage("no-permission").replace("{permission}", perm));
         return false;
     }
