@@ -12,6 +12,7 @@ messages:
   warp-auto-locked: "&cEsta warp foi trancada: Terreno removido ou local inseguro."
   warp-locked-error: "&cEsta warp está trancada pelo dono."
   warp-teleport: "&aVocê viajou para a warp &f{warp}&a."
+  plugin-reloaded: "&a[PW] Configurações e menus recarregados com sucesso!"
   
   broadcast-create: "&b&lPW &8» &f{player} &7criou a warp &b/pw {warp}"
   broadcast-delete: "&b&lPW &8» &7A warp &f{warp} &7foi removida por &f{player}"
@@ -30,21 +31,21 @@ messages:
   discord-delete-desc: "O jogador **{player}** deletou a warp: **{warp}**"
 
   edit-name-tutorial:
-    - "&eL1: Para trocar o nome da warp digite o comando abaixo:"
-    - "&eL2: &b/pwsetname <old_warpname> <new_warpname>"
-    - "&eL5: &8Permissão: pw.setname"
+    - "&bPara trocar o nome da warp digite o comando abaixo:"
+    - "&a/pwsetname <old_warpname> <new_warpname>"
+    - "&fPermissão: &epw.setname"
   edit-lore-tutorial:
-    - "&eL1: Para trocar a lore da warp digite o comando abaixo:"
-    - "&eL2: &b/pwsetlore <warp_name> <mensagem formatada>"
-    - "&eL5: &8Permissão: pw.setlore"
+    - "&bPara trocar a lore da warp digite o comando abaixo:"
+    - "&a/pwsetlore <warp_name> <mensagem formatada>"
+    - "&fPermissão: &epw.setlore"
   edit-icon-tutorial:
-    - "&eL1: Para trocar o icone da warp digite o comando abaixo:"
-    - "&eL2: &b/pwseticon <warp_name> &7segurando um item na mão"
-    - "&eL3: &8Permissão: pw.seticon"
+    - "&bPara trocar o icone da warp digite o comando abaixo:"
+    - "&a/pwseticon <warp_name> &7segurando um item na mão"
+    - "&fPermissão: &epw.seticon"
   edit-remove-tutorial:
-    - "&eL1: Para remover sua warp digite o comando abaixo:"
-    - "&eL2: &c/pwdel <warp_name> confirm"
-    - "&eL3: &8Permissão: pw.del"
+    - "&bPara remover sua warp digite o comando abaixo:"
+    - "&c/pwdel <warp_name> confirm"
+    - "&fPermissão: &epw.del"
 
   success:
     name-changed: "&aNome da warp alterado com sucesso."

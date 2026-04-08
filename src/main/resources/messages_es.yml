@@ -1,10 +1,11 @@
+# Mensajes en Español
 messages:
   prefix: "&b&lPW &8» "
-  no-permission: "&cNo tienes permiso: {permission} o pw.use."
-  permission-denied-admin: "&cEl permiso {permission} fue denegado por el Admin."
+  no-permission: "&cNo tienes permiso: {permission} o pw.use para usar este comando."
+  permission-denied-admin: "&cEl permiso {permission} fue denegado por el Administrador."
   warp-not-found: "&cWarp no encontrada."
-  limit-reached: "&cHas alcanzado tu límite de {limit} warps."
-  unsafe-location: "&c¡Esta ubicación no es segura para un warp!"
+  limit-reached: "&cHas alcanzado tu límite de {limit} warps. ¡Mejora tu rango para crear más!"
+  unsafe-location: "&c¡Esta ubicación no es segura o permitida para un warp!"
   no-build-permission: "&c¡No tienes permiso (Trust/Build) en este terreno!"
   warp-exists: "&c¡Ya existe un warp con este nombre!"
   warp-created: "&a¡Warp '&f{warp}&a' creado con éxito!"
@@ -12,11 +13,14 @@ messages:
   warp-auto-locked: "&cEste warp ha sido bloqueado: Terreno eliminado o ubicación insegura."
   warp-locked-error: "&cEste warp está bloqueado por el dueño."
   warp-teleport: "&aHas viajado al warp &f{warp}&a."
+  plugin-reloaded: "&a[PW] ¡Configuraciones y menús recargados con éxito!"
   
+  # Anuncios Globales
   broadcast-create: "&b&lPW &8» &f{player} &7creó el warp &b/pw {warp}"
   broadcast-delete: "&b&lPW &8» &7El warp &f{warp} &7fue eliminado por &f{player}"
   broadcast-teleport: "&b&lPW &8» &f{player} &7viajó al warp &b{warp}"
 
+  # Navegación y Discord
   gui-previous-page-name: "&aPágina Anterior"
   gui-previous-page-lore: ["&7Haz clic para volver"]
   gui-next-page-name: "&aPágina Siguiente"
@@ -29,10 +33,30 @@ messages:
   discord-delete-title: "Warp Eliminado"
   discord-delete-desc: "El jugador **{player}** eliminó el warp: **{warp}**"
 
-  edit-name-tutorial: ["&ePara cambiar el nombre: /pwsetname <old> <new>"]
-  edit-lore-tutorial: ["&ePara cambiar la descripción: /pwsetlore <warp> <texto>"]
-  edit-icon-tutorial: ["&ePara cambiar el icono: /pwseticon <warp>"]
-  edit-remove-tutorial: ["&ePara eliminar: /pwdel <warp> confirm"]
+  # Tutoriales de Edición
+  edit-name-tutorial:
+    - "&bPara cambiar el nombre del warp, escribe el comando:"
+    - "&a/pwsetname <old_warpname> <new_warpname>"
+    - "&2old_warpname es el nombre actual"
+    - "&2new_warpname es el nuevo nombre"
+    - "&fPermiso: &epw.setname"
+  
+  edit-lore-tutorial:
+    - "&bPara cambiar la descripción, escribe el comando:"
+    - "&a/pwsetlore <warp_name> <mensaje formateado>"
+    - "&2Puedes usar códigos de colores, ej: &7/pw &bxp"
+    - "&2Puedes configurar más líneas usando , o ;"
+    - "&fPermiso: &epw.setlore"
+
+  edit-icon-tutorial:
+    - "&bPara cambiar el icono, escribe el comando:"
+    - "&a/pwseticon <warp_name> &7con un objeto en la mano"
+    - "&fPermiso: &epw.seticon"
+
+  edit-remove-tutorial:
+    - "&bPara eliminar tu warp, escribe el comando:"
+    - "&c/pwdel <warp_name> confirm"
+    - "&fPermiso: &epw.del"
 
   success:
     name-changed: "&aNombre cambiado con éxito."

@@ -2,6 +2,7 @@ package com.comonier.plugin.commands;
 
 import com.comonier.plugin.PW;
 import com.comonier.plugin.managers.*;
+import com.comonier.plugin.menus.WarpListMenu;
 import com.comonier.plugin.models.Warp;
 import com.comonier.plugin.utils.DiscordWebhook;
 import org.bukkit.Bukkit;
@@ -13,21 +14,22 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /*
- * Main command /pw.
- * Handles teleportation with localized messages and Discord Webhook integration.
+ * Updated PWCommand.
+ * Opens the Warp List immediately for better user experience.
+ * Includes Global and Discord announcements.
  */
 public class PWCommand implements CommandExecutor {
 
     private final PW plugin;
     private final WarpManager warpManager;
-    private final MenuManager menuManager;
+    private final WarpListMenu warpListMenu;
     private final ProtectionManager protectionManager;
 
     public PWCommand(PW plugin, WarpManager warpManager, MenuManager menuManager, ProtectionManager protectionManager) {
         this.plugin = plugin;
         this.warpManager = warpManager;
-        this.menuManager = menuManager;
         this.protectionManager = protectionManager;
+        this.warpListMenu = new WarpListMenu(plugin);
     }
 
     @Override
@@ -40,17 +42,20 @@ public class PWCommand implements CommandExecutor {
             return true;
         }
 
+        // /pw - Opens the Warp List immediately instead of the blank static menu
         if (args.length == 0) {
-            menuManager.openMainMenu(player);
+            warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps", 0);
             return true;
         }
 
+        // /pw <warp_name> - Teleport logic
         Warp warp = warpManager.getWarp(args[0]);
         if (warp == null) {
             player.sendMessage(plugin.getMessage("warp-not-found"));
             return true;
         }
 
+        // Safety check for location protection
         if (!protectionManager.isLocationStillSafe(warp.getOwnerName(), warp.getLocation())) {
             if (!warp.isLocked()) {
                 warp.setLocked(true);
@@ -60,25 +65,26 @@ public class PWCommand implements CommandExecutor {
             return true;
         }
 
+        // Check if warp is locked
         if (warp.isLocked() && !warp.getOwnerUUID().equals(player.getUniqueId()) && !player.hasPermission("pw.admin")) {
             player.sendMessage(plugin.getMessage("warp-locked-error"));
             return true;
         }
 
+        // Teleport player
         player.teleport(warp.getLocation());
         warp.addVisit();
         warpManager.saveWarp(warp);
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         player.sendMessage(plugin.getMessage("warp-teleport").replace("{warp}", warp.getName()));
 
-        // Global Broadcast
+        // Announcements
         if (plugin.getConfig().getBoolean("announcements.global-chat")) {
             Bukkit.broadcastMessage(plugin.getMessage("broadcast-teleport")
                     .replace("{player}", player.getName())
                     .replace("{warp}", warp.getName()));
         }
 
-        // Discord Webhook
         if (plugin.getConfig().getBoolean("announcements.discord.enabled")) {
             String title = plugin.getMessage("discord-teleport-title");
             String desc = plugin.getMessage("discord-teleport-desc")

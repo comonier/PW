@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -15,6 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/*
+ * Updated WarpListMenu.
+ * Logic fixed: Free slots (White) and Locked slots (Red) only appear in Personal Warp Menu.
+ * Overload method added to fix compilation error with createItem.
+ */
 public class WarpListMenu {
 
     private final PW plugin;
@@ -37,6 +43,9 @@ public class WarpListMenu {
         int itemsPerPage = availableSlots.size();
         int startIndex = page * itemsPerPage;
         int playerLimit = getWarpLimit(player);
+        
+        // Check if this is the Personal Menu
+        boolean isPersonalMenu = title.contains("Suas Warps");
 
         for (int i = 0; i < itemsPerPage; i++) {
             int warpIndex = startIndex + i;
@@ -45,7 +54,7 @@ public class WarpListMenu {
             if (warpIndex < warps.size()) {
                 inv.setItem(slot, formatWarpIcon(warps.get(warpIndex)));
             } 
-            else {
+            else if (isPersonalMenu) {
                 if (warpIndex < playerLimit) {
                     inv.setItem(slot, createItem(Material.WHITE_STAINED_GLASS_PANE, "&fWarp " + (warpIndex + 1), List.of("&eEspaço Livre")));
                 } else {
@@ -54,7 +63,7 @@ public class WarpListMenu {
             }
         }
 
-        // Navigation using migrated messages
+        // Navigation
         if (page > 0) {
             inv.setItem(45, createItem(
                 Material.valueOf(plugin.getConfig().getString("navigation.previous-page-material")), 
@@ -62,7 +71,11 @@ public class WarpListMenu {
                 plugin.getMessageList("gui-previous-page-lore")
             ));
         }
-        if (warps.size() > (startIndex + itemsPerPage) || (startIndex + itemsPerPage) < playerLimit) {
+        
+        boolean hasMoreWarps = warps.size() > (startIndex + itemsPerPage);
+        boolean hasMorePersonalSlots = isPersonalMenu && (playerLimit > (startIndex + itemsPerPage));
+
+        if (hasMoreWarps || hasMorePersonalSlots) {
             inv.setItem(53, createItem(
                 Material.valueOf(plugin.getConfig().getString("navigation.next-page-material")), 
                 plugin.getMessage("gui-next-page-name"), 
@@ -122,11 +135,13 @@ public class WarpListMenu {
             lore.add("");
             lore.add("§eClique para teleportar.");
             meta.setLore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             item.setItemMeta(meta);
         }
         return item;
     }
 
+    // Main createItem method
     private ItemStack createItem(Material mat, String name, List<String> lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
@@ -135,11 +150,18 @@ public class WarpListMenu {
             if (lore != null) {
                 meta.setLore(lore.stream().map(s -> s.replace("&", "§")).collect(Collectors.toList()));
             }
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            try {
+                meta.addItemFlags(ItemFlag.valueOf("HIDE_ADDITIONAL_TOOLTIP"));
+            } catch (Exception ignored) {
+                meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+            }
             item.setItemMeta(meta);
         }
         return item;
     }
 
+    // Overload createItem method to prevent compilation errors
     private ItemStack createItem(Material mat, String name) {
         return createItem(mat, name, null);
     }

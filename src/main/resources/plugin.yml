@@ -14,6 +14,9 @@ commands:
   pwset:
     description: Creates a new player warp at your current location.
     permission: pw.set
+  pwreload:
+    description: Reloads the plugin configuration and menus.
+    permission: pw.admin
   pwedit:
     description: Opens the edit menu for your own warp.
     permission: pw.edit
@@ -22,21 +25,26 @@ commands:
     permission: pw.admin
   pwsetname:
     description: Changes the name of a specific warp.
+    permission: pw.setname
   pwsetlore:
     description: Changes the lore/description of a specific warp.
+    permission: pw.setlore
   pwseticon:
-    description: Changes the icon of a specific warp.
+    description: Changes the icon of a specific warp using the item in hand.
+    permission: pw.seticon
   pwdel:
     description: Permanently removes a warp.
+    permission: pw.del
   pwreset:
     description: Resets a warp's location to your current position.
+    permission: pw.reset
 
 permissions:
   pw.use:
     description: Default permission to use the system and open the main menu.
     default: true
   pw.admin:
-    description: Full administrative access to manage any warp.
+    description: Full administrative access.
     default: op
   pw.set:
     description: Allows the player to create a new warp.
@@ -46,4 +54,19 @@ permissions:
     default: true
   pw.tp:
     description: Allows the player to teleport to warps.
+    default: true
+  pw.setname:
+    description: Allows the player to change warp names.
+    default: true
+  pw.setlore:
+    description: Allows the player to change warp lores.
+    default: true
+  pw.seticon:
+    description: Allows the player to change warp icons.
+    default: true
+  pw.del:
+    description: Allows the player to delete their own warps.
+    default: true
+  pw.reset:
+    description: Allows the player to reset their own warp location.
     default: true

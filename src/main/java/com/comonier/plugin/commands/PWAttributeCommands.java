@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * Handles attribute modification commands with full message migration.
+ * Handles attribute modification commands with syntax guarding and full message migration.
  * Commands: /pwsetname, /pwsetlore, /pwseticon, /pwdel, /pwreset.
  */
 public class PWAttributeCommands implements CommandExecutor {
@@ -39,7 +39,11 @@ public class PWAttributeCommands implements CommandExecutor {
         if (!(sender instanceof Player)) return true;
         Player player = (Player) sender;
 
-        if (args.length == 0) return false;
+        // Syntax Guard to prevent ArrayIndexOutOfBoundsException
+        if (args == null || args.length == 0) {
+            player.sendMessage("§cArgumento incompleto! Use: /" + label + " <nome_da_warp>");
+            return true;
+        }
 
         Warp warp = warpManager.getWarp(args[0]);
         if (warp == null) {
@@ -66,6 +70,8 @@ public class PWAttributeCommands implements CommandExecutor {
                     warpManager.createWarp(warp);
                     player.sendMessage(plugin.getMessage("success.name-changed"));
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+                } else {
+                    player.sendMessage("§cUse: /pwsetname " + warp.getName() + " <novo_nome>");
                 }
                 break;
 
@@ -86,6 +92,8 @@ public class PWAttributeCommands implements CommandExecutor {
                     warpManager.saveWarp(warp);
                     player.sendMessage(plugin.getMessage("success.lore-changed"));
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+                } else {
+                    player.sendMessage("§cUse: /pwsetlore " + warp.getName() + " <descrição>");
                 }
                 break;
 

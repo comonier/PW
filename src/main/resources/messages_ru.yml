@@ -1,22 +1,26 @@
+# Русские сообщения
 messages:
   prefix: "&b&lPW &8» "
   no-permission: "&cУ вас нет разрешения: {permission} или pw.use."
   permission-denied-admin: "&cРазрешение {permission} было отклонено."
   warp-not-found: "&cВарп не найден."
-  limit-reached: "&cВы достигли лимита в {limit} варпов."
-  unsafe-location: "&cЭто место небезопасно для варпа!"
+  limit-reached: "&cВы достигли лимита в {limit} варпов. Повысьте статус!"
+  unsafe-location: "&cЭто место небезопасно или недоступно для варпа!"
   no-build-permission: "&cУ вас нет прав на строительство здесь!"
   warp-exists: "&cВарп с таким именем уже существует!"
   warp-created: "&aВарп '&f{warp}&a' успешно создан!"
   warp-deleted: "&aВарп успешно удален."
   warp-auto-locked: "&cВарп заблокирован: Место небезопасно."
   warp-locked-error: "&cЭтот варп заблокирован владельцем."
-  warp-teleport: "&aВы отправились на варп &f{warp}&a."
+  warp-teleport: "&aВы телепортировались на варп &f{warp}&a."
+  plugin-reloaded: "&a[PW] Настройки и меню успешно перезагружены!"
   
+  # Глобальные объявления
   broadcast-create: "&b&lPW &8» &f{player} &7создал варп &b/pw {warp}"
   broadcast-delete: "&b&lPW &8» &7Варп &f{warp} &7был удален игроком &f{player}"
   broadcast-teleport: "&b&lPW &8» &f{player} &7отправился на варп &b{warp}"
 
+  # Навигация и Discord
   gui-previous-page-name: "&aПредыдущая страница"
   gui-previous-page-lore: ["&7Нажмите, чтобы вернуться"]
   gui-next-page-name: "&aСледующая страница"
@@ -29,16 +33,36 @@ messages:
   discord-delete-title: "Варп удален"
   discord-delete-desc: "Игрок **{player}** удалил варп: **{warp}**"
 
-  edit-name-tutorial: ["&eСмена имени: /pwsetname <old> <new>"]
-  edit-lore-tutorial: ["&eСмена описания: /pwsetlore <warp> <text>"]
-  edit-icon-tutorial: ["&eСмена иконки: /pwseticon <warp>"]
-  edit-remove-tutorial: ["&eУдаление: /pwdel <warp> confirm"]
+  # Обучение редактированию
+  edit-name-tutorial:
+    - "&b Чтобы изменить название варпа, введите команду:"
+    - "&a/pwsetname <старое_имя> <новое_имя>"
+    - "&2старое_имя - текущее название"
+    - "&2новое_имя - новое название"
+    - "&fРазрешение: &epw.setname"
+  
+  edit-lore-tutorial:
+    - "&b Чтобы изменить описание, введите команду:"
+    - "&a/pwsetlore <имя_варпа> <текст>"
+    - "&2Вы можете использовать цветовые коды, например: &7/pw &bxp"
+    - "&2Вы можете добавить новые строки через , или ;"
+    - "&fРазрешение: &epw.setlore"
+
+  edit-icon-tutorial:
+    - "&b Чтобы изменить иконку, введите команду:"
+    - "&a/pwseticon <имя_варпа> &7держа предмет в руке"
+    - "&fРазрешение: &epw.seticon"
+
+  edit-remove-tutorial:
+    - "&b Чтобы удалить варп, введите команду:"
+    - "&c/pwdel <имя_варпа> confirm"
+    - "&fРазрешение: &epw.del"
 
   success:
-    name-changed: "&aНазвание изменено."
-    lore-changed: "&aОписание изменено."
-    icon-changed: "&aИконка изменена."
-    location-reset: "&aТочка варпа обновлена."
-    warp-removed: "&aВарп удален."
+    name-changed: "&aНазвание успешно изменено."
+    lore-changed: "&aОписание успешно изменено."
+    icon-changed: "&aИконка успешно изменена."
+    location-reset: "&aТочка варпа успешно обновлена."
+    warp-removed: "&aВарп успешно удален."
     warp-locked: "&cВарп заблокирован."
     warp-unlocked: "&aВарп разблокирован."

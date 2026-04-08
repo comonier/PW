@@ -41,3 +41,4 @@ permissions:
   lock: "pw.lock"
   delete: "pw.del"
   set: "pw.set"
+  reload: "pw.admin"

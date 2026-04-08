@@ -8,12 +8,13 @@ import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- * Provides tab-completion for all PW commands.
- * Lists available warps based on context.
+ * Dynamic Tab Completer with null-safety and syntax guarding.
  */
 public class PWTabCompleter implements TabCompleter {
 
@@ -25,17 +26,29 @@ public class PWTabCompleter implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        // Guard against empty args or nulls to prevent console errors
+        if (args == null || args.length == 0) return Collections.emptyList();
+
         List<String> completions = new ArrayList<>();
-        
-        if (args.length == 1) {
-            String input = args[0].toLowerCase();
-            List<String> warpNames = plugin.getWarpManager().getWarps().stream()
+        String cmdName = command.getName().toLowerCase();
+        String currentArg = args[args.length - 1].toLowerCase();
+
+        // List of commands that suggest warp names as the first argument
+        List<String> warpCommands = Arrays.asList("pw", "pwedit", "pweditplayer", "pwsetname", "pwsetlore", "pwseticon", "pwdel", "pwreset");
+
+        if (warpCommands.contains(cmdName) && args.length == 1) {
+            completions.addAll(plugin.getWarpManager().getWarps().stream()
                     .map(Warp::getName)
-                    .filter(name -> name.toLowerCase().startsWith(input))
-                    .collect(Collectors.toList());
-            completions.addAll(warpNames);
+                    .filter(name -> name.toLowerCase().startsWith(currentArg))
+                    .collect(Collectors.toList()));
         }
 
+        // Specific guard for /pwdel confirmation
+        if (cmdName.equals("pwdel") && args.length == 2) {
+            if ("confirm".startsWith(currentArg)) completions.add("confirm");
+        }
+
+        Collections.sort(completions);
         return completions;
     }
 }

@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/*
+ * Main class for the PW plugin.
+ * Handles initialization, database, and reloading logic.
+ */
 public class PW extends JavaPlugin {
 
     private static PW instance;
@@ -46,10 +50,14 @@ public class PW extends JavaPlugin {
         this.menuManager = new MenuManager(this);
 
         PWTabCompleter tabCompleter = new PWTabCompleter(this);
+        
         getCommand("pw").setExecutor(new PWCommand(this, warpManager, menuManager, protectionManager));
         getCommand("pw").setTabCompleter(tabCompleter);
+        
         getCommand("pwset").setExecutor(new PWSetCommand(this, warpManager, protectionManager));
         getCommand("pwset").setTabCompleter(tabCompleter);
+
+        getCommand("pwreload").setExecutor(new PWReloadCommand(this));
 
         PWEditCommand editCmd = new PWEditCommand(this, warpManager, menuManager);
         getCommand("pwedit").setExecutor(editCmd);
@@ -63,6 +71,14 @@ public class PW extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new MenuListener(this, warpManager, menuManager), this);
+    }
+
+    public void reloadPlugin() {
+        reloadConfig();
+        this.databaseManager = new DatabaseManager(this);
+        this.protectionManager = new ProtectionManager(this);
+        this.warpManager = new WarpManager(this, databaseManager);
+        this.menuManager = new MenuManager(this);
     }
 
     public String getMessage(String path) {
