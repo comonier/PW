@@ -1,24 +1,17 @@
 package com.comonier.plugin;
 
-import com.comonier.plugin.commands.PWAttributeCommands;
-import com.comonier.plugin.commands.PWCommand;
-import com.comonier.plugin.commands.PWEditCommand;
-import com.comonier.plugin.commands.PWTabCompleter;
+import com.comonier.plugin.commands.*;
 import com.comonier.plugin.listeners.MenuListener;
-import com.comonier.plugin.managers.DatabaseManager;
-import com.comonier.plugin.managers.MenuManager;
-import com.comonier.plugin.managers.WarpManager;
+import com.comonier.plugin.managers.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.logging.Logger;
 
 /*
- * Main class for the PW (Player Warps) plugin.
- * Handles initialization of database, managers, commands, and tab completion.
- * Fully compatible with 1.19+ and Folia (26.1+).
+ * Main class for the PW plugin.
+ * Centralizes configuration, database, and multilingual messages.
  */
 public class PW extends JavaPlugin {
 
@@ -30,12 +23,11 @@ public class PW extends JavaPlugin {
     private WarpManager warpManager;
     private MenuManager menuManager;
     private DatabaseManager databaseManager;
+    private ProtectionManager protectionManager;
 
     @Override
     public void onEnable() {
         instance = this;
-
-        // Save default config and messages
         saveDefaultConfig();
         saveResource("PWMenu.yml", false);
         saveResource("messages_pt.yml", false);
@@ -43,25 +35,25 @@ public class PW extends JavaPlugin {
         saveResource("messages_es.yml", false);
         saveResource("messages_ru.yml", false);
 
-        // Setup Vault
         if (!setupPermissions()) {
-            log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            log.severe(String.format("[%s] - Vault not found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         setupChat();
 
-        // Initialize Persistence and Managers
         this.databaseManager = new DatabaseManager(this);
+        this.protectionManager = new ProtectionManager(this);
         this.warpManager = new WarpManager(this, databaseManager);
         this.menuManager = new MenuManager(this);
 
-        // Register Tab Completer
         PWTabCompleter tabCompleter = new PWTabCompleter(this);
-
-        // Register Commands and Tab Completion
-        getCommand("pw").setExecutor(new PWCommand(this, warpManager, menuManager));
+        
+        getCommand("pw").setExecutor(new PWCommand(this, warpManager, menuManager, protectionManager));
         getCommand("pw").setTabCompleter(tabCompleter);
+        
+        getCommand("pwset").setExecutor(new PWSetCommand(this, warpManager, protectionManager));
+        getCommand("pwset").setTabCompleter(tabCompleter);
         
         PWEditCommand editCmd = new PWEditCommand(this, warpManager, menuManager);
         getCommand("pwedit").setExecutor(editCmd);
@@ -69,20 +61,23 @@ public class PW extends JavaPlugin {
         getCommand("pweditplayer").setExecutor(editCmd);
         getCommand("pweditplayer").setTabCompleter(tabCompleter);
 
-        PWAttributeCommands attrCmd = new PWAttributeCommands(this, warpManager);
+        PWAttributeCommands attrCmd = new PWAttributeCommands(this, warpManager, protectionManager);
         String[] attrCommands = {"pwsetname", "pwsetlore", "pwseticon", "pwdel", "pwreset"};
         for (String cmd : attrCommands) {
             getCommand(cmd).setExecutor(attrCmd);
             getCommand(cmd).setTabCompleter(tabCompleter);
         }
 
-        // Register Listeners
         getServer().getPluginManager().registerEvents(new MenuListener(this, warpManager, menuManager), this);
+        log.info(String.format("[%s] Plugin enabled version %s", getDescription().getName(), getDescription().getVersion()));
+    }
 
-        log.info(String.format("[%s] Plugin enabled version %s (DB: %s)", 
-            getDescription().getName(), 
-            getDescription().getVersion(),
-            getConfig().getString("database.type")));
+    public String getMessage(String path) {
+        String lang = getConfig().getString("settings.language", "pt");
+        org.bukkit.configuration.file.FileConfiguration msgConfig = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages_" + lang + ".yml"));
+        String msg = msgConfig.getString("messages." + path);
+        if (msg == null) return "§cMessage path not found: " + path;
+        return msg.replace("&", "§");
     }
 
     @Override
@@ -111,4 +106,5 @@ public class PW extends JavaPlugin {
     public WarpManager getWarpManager() { return warpManager; }
     public MenuManager getMenuManager() { return menuManager; }
     public DatabaseManager getDatabaseManager() { return databaseManager; }
+    public ProtectionManager getProtectionManager() { return protectionManager; }
 }

@@ -13,11 +13,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /*
  * Listens to inventory clicks to handle menu navigation and actions.
- * Updated to handle pagination, sorting filters and edit commands.
+ * Fixed save method reference for compatibility with Database WarpManager.
  */
 public class MenuListener implements Listener {
 
@@ -45,13 +44,10 @@ public class MenuListener implements Listener {
 
         if (clicked == null || clicked.getType().isAir()) return;
 
-        // Logic for Main/List Menus
         if (title.contains("Player Warps")) {
             handleListMenuClick(player, slot, title);
         } 
-        // Logic for Edit Panel
         else if (title.contains("Editando Warp")) {
-            // Extracts warp name from title "Editando Warp: Name"
             String[] parts = title.split(":");
             if (parts.length > 1) {
                 String warpName = parts[1].trim();
@@ -66,29 +62,29 @@ public class MenuListener implements Listener {
     private void handleListMenuClick(Player player, int slot, String title) {
         int currentPage = 0;
         try {
-            String[] parts = title.split("Pg ");
-            if (parts.length > 1) currentPage = Integer.parseInt(parts[1].trim()) - 1;
+            if (title.contains("Pg ")) {
+                String[] parts = title.split("Pg ");
+                currentPage = Integer.parseInt(parts[1]) - 1;
+            }
         } catch (Exception e) { currentPage = 0; }
 
-        if (slot == 0) { // Own Warps
+        if (slot == 0) {
             List<Warp> ownWarps = warpManager.getPlayerWarps(player.getUniqueId());
             warpListMenu.open(player, ownWarps, "§8Player Warps - Suas Warps", 0);
-        } else if (slot == 7) { // Filter by Name (Visits/Date)
-            List<Warp> allWarps = warpManager.getAllWarpsSorted();
-            warpListMenu.open(player, allWarps, "§8Player Warps - Nome", 0);
-        } else if (slot == 8) { // Filter by Players (Total visits sum)
-            // Sorting by player logic is handled in the warp manager sorted list
+        } else if (slot == 7) {
+            warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Nome", 0);
+        } else if (slot == 8) {
             warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Jogadores", 0);
-        } else if (slot == 45) { // Prev Page
+        } else if (slot == 45) {
             if (currentPage > 0) {
                 warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Nome", currentPage - 1);
             }
-        } else if (slot == 53) { // Next Page
+        } else if (slot == 53) {
             warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Nome", currentPage + 1);
-        } else if (slot > 9 && slot < 44) { // Click on a Warp icon
+        } else if (slot > 9 && slot < 44) {
             ItemStack item = player.getOpenInventory().getItem(slot);
             if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                String warpName = item.getItemMeta().getDisplayName().substring(2); // Remove color code
+                String warpName = item.getItemMeta().getDisplayName().substring(2); 
                 player.performCommand("pw " + warpName);
             }
         }
@@ -96,58 +92,53 @@ public class MenuListener implements Listener {
 
     private void handleEditMenuClick(Player player, int slot, Warp warp) {
         switch (slot) {
-            case 28: // Teleport
+            case 28:
                 player.closeInventory();
                 player.performCommand("pw " + warp.getName());
                 break;
-            case 30: // Reset Location
+            case 30:
                 player.closeInventory();
                 player.performCommand("pwreset " + warp.getName());
                 break;
-            case 32: // Change Name Tutorial
+            case 32:
                 player.closeInventory();
-                sendTutorial(player, "edit-name-tutorial");
+                sendTutorial(player, "edit-name-tutorial", warp.getName());
                 break;
-            case 34: // Change Lore Tutorial
+            case 34:
                 player.closeInventory();
-                sendTutorial(player, "edit-lore-tutorial");
+                sendTutorial(player, "edit-lore-tutorial", warp.getName());
                 break;
-            case 37: // Back to main
+            case 37:
                 menuManager.openMainMenu(player);
                 break;
-            case 39: // Change Icon Tutorial
+            case 39:
                 player.closeInventory();
-                sendTutorial(player, "edit-icon-tutorial");
+                sendTutorial(player, "edit-icon-tutorial", warp.getName());
                 break;
-            case 41: // Lock/Unlock Toggle
+            case 41:
                 if (!player.hasPermission("pw.lock") && !player.hasPermission("pw.use")) {
                     player.sendActionBar("§cVocê não possui a permissão: pw.lock");
                     return;
                 }
                 boolean newState = !warp.isLocked();
                 warp.setLocked(newState);
-                warpManager.saveWarps();
+                warpManager.saveWarp(warp);
                 player.playSound(player.getLocation(), newState ? Sound.BLOCK_CHEST_CLOSE : Sound.BLOCK_CHEST_OPEN, 1f, 1f);
                 player.sendActionBar(newState ? "§cWarp trancada com sucesso." : "§aWarp destrancada com sucesso.");
                 menuManager.openEditMenu(player, warp);
                 break;
-            case 43: // Remove Tutorial
+            case 43:
                 player.closeInventory();
-                sendTutorial(player, "edit-remove-tutorial");
+                sendTutorial(player, "edit-remove-tutorial", warp.getName());
                 break;
         }
     }
 
-    private void sendTutorial(Player player, String key) {
+    private void sendTutorial(Player player, String key, String warpName) {
         List<String> lines = plugin.getConfig().getStringList("messages." + key);
-        if (lines.isEmpty()) {
-            // Fallback if config is missing
-            player.sendMessage("§eSiga as instruções do comando para editar sua warp.");
-        } else {
-            for (String line : lines) {
-                player.sendMessage(line.replace("&", "§"));
-            }
+        for (String line : lines) {
+            player.sendMessage(line.replace("&", "§"));
         }
-        player.sendMessage("§8Digite: /pwedit " + " <warp> para voltar ao menu.");
+        player.sendMessage("§8Digite: /pwedit " + warpName + " para voltar ao menu.");
     }
 }

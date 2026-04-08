@@ -4,24 +4,39 @@ messages:
   no-permission: "&cYou do not have permission: {permission} or pw.use to use this command."
   permission-denied-admin: "&cThe permission {permission} was denied by the Administrator."
   warp-not-found: "&cWarp not found."
+  limit-reached: "&cYou have reached your limit of {limit} warps. Upgrade your rank to create more!"
+  unsafe-location: "&cThis location is not safe or allowed for a warp!"
+  no-build-permission: "&cYou do not have permission (Trust/Build) in this land!"
+  warp-exists: "&cA warp with this name already exists!"
+  warp-created: "&aWarp '&f{warp}&a' created successfully!"
+  warp-deleted: "&aWarp removed successfully."
+  warp-auto-locked: "&cThis warp has been locked: Land removed or unsafe location."
+  warp-locked-error: "&cThis warp is locked by the owner."
+  warp-teleport: "&aYou traveled to warp &f{warp}&a."
   
+  # Global Announcements
+  broadcast-create: "&b&lPW &8» &f{player} &7created warp &b/pw {warp}"
+  broadcast-delete: "&b&lPW &8» &7Warp &f{warp} &7was removed by &f{player}"
+  broadcast-teleport: "&b&lPW &8» &f{player} &7traveled to warp &b{warp}"
+
+  # Edition Tutorials
   edit-name-tutorial:
     - "&eL1: To change the warp name, type the command below:"
     - "&eL2: &b/pwsetname <old_warpname> <new_warpname>"
-    - "&eL3: &7old_warpname is the current name"
-    - "&eL4: &7new_warpname is the new name"
+    - "&eL3: &7old_warpname is the current warp name"
+    - "&eL4: &7new_warpname is the new warp name"
     - "&eL5: &8Permission: pw.setname"
   
   edit-lore-tutorial:
     - "&eL1: To change the warp lore, type the command below:"
     - "&eL2: &b/pwsetlore <warp_name> <formatted message>"
     - "&eL3: &7You can use color codes, example: &7/pw &bxp"
-    - "&eL4: &7You can set multiple lines using , or ;"
+    - "&eL4: &7You can set other lines using , or ;"
     - "&eL5: &8Permission: pw.setlore"
 
   edit-icon-tutorial:
     - "&eL1: To change the warp icon, type the command below:"
-    - "&eL2: &b/pwseticon <warp_name> &7holding an item in your hand"
+    - "&eL2: &b/pwseticon <warp_name> &7holding an item in hand"
     - "&eL3: &8Permission: pw.seticon"
 
   edit-remove-tutorial:

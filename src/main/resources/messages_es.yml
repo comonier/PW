@@ -4,9 +4,24 @@ messages:
   no-permission: "&cNo tienes permiso: {permission} o pw.use para usar este comando."
   permission-denied-admin: "&cEl permiso {permission} fue denegado por el Administrador."
   warp-not-found: "&cWarp no encontrada."
+  limit-reached: "&cHas alcanzado tu límite de {limit} warps. ¡Mejora tu rango para crear más!"
+  unsafe-location: "&c¡Esta ubicación no es segura o permitida para un warp!"
+  no-build-permission: "&c¡No tienes permiso (Trust/Build) en este terreno!"
+  warp-exists: "&c¡Ya existe un warp con este nombre!"
+  warp-created: "&a¡Warp '&f{warp}&a' creado con éxito!"
+  warp-deleted: "&aWarp eliminado con éxito."
+  warp-auto-locked: "&cEste warp ha sido bloqueado: Terreno eliminado o ubicación insegura."
+  warp-locked-error: "&cEste warp está bloqueado por el dueño."
+  warp-teleport: "&aHas viajado al warp &f{warp}&a."
   
+  # Anuncios Globales
+  broadcast-create: "&b&lPW &8» &f{player} &7creó el warp &b/pw {warp}"
+  broadcast-delete: "&b&lPW &8» &7El warp &f{warp} &7fue eliminado por &f{player}"
+  broadcast-teleport: "&b&lPW &8» &f{player} &7viajó al warp &b{warp}"
+
+  # Tutoriales de Edición
   edit-name-tutorial:
-    - "&eL1: Para cambiar el nombre de la warp, escribe el comando:"
+    - "&eL1: Para cambiar el nombre del warp, escribe el comando:"
     - "&eL2: &b/pwsetname <old_warpname> <new_warpname>"
     - "&eL3: &7old_warpname es el nombre actual"
     - "&eL4: &7new_warpname es el nuevo nombre"

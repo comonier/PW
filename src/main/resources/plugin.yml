@@ -3,40 +3,47 @@ version: '${project.version}'
 main: com.comonier.plugin.PW
 api-version: 1.19
 author: Comonier
-description: Sistema de Player Warps dinâmico com suporte a GUI e Bedrock.
+description: Dynamic Player Warps system with GUI and Bedrock support.
 depend: [Vault]
+
 commands:
   pw:
-    description: Comando principal do Player Warps.
+    description: Main Player Warps command. Opens the GUI or teleports to a warp.
     aliases: [pwarp, playerwarp]
     permission: pw.use
+  pwset:
+    description: Creates a new player warp at your current location.
+    permission: pw.set
   pwedit:
-    description: Abre o menu de edição da sua warp.
+    description: Opens the edit menu for your own warp.
     permission: pw.edit
   pweditplayer:
-    description: Administradores editam warps de outros jogadores.
+    description: Allows admins to edit warps from other players.
     permission: pw.admin
   pwsetname:
-    description: Altera o nome de uma warp.
+    description: Changes the name of a specific warp.
   pwsetlore:
-    description: Altera a lore de uma warp.
+    description: Changes the lore/description of a specific warp.
   pwseticon:
-    description: Altera o ícone de uma warp.
+    description: Changes the icon of a specific warp.
   pwdel:
-    description: Remove uma warp.
+    description: Permanently removes a warp.
   pwreset:
-    description: Redefine a localização de uma warp.
+    description: Resets a warp's location to your current position.
 
 permissions:
   pw.use:
-    description: Permissão padrão para usar o sistema e abrir o menu.
+    description: Default permission to use the system and open the main menu.
     default: true
   pw.admin:
-    description: Permissão total de administrador.
+    description: Full administrative access to manage any warp.
     default: op
+  pw.set:
+    description: Allows the player to create a new warp.
+    default: true
   pw.edit:
-    description: Permissão para editar as próprias warps.
+    description: Allows the player to edit their own warps.
     default: true
   pw.tp:
-    description: Permissão para se teleportar para warps.
+    description: Allows the player to teleport to warps.
     default: true
