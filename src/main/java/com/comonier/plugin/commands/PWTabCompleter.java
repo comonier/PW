@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- * Fixed Tab Completer.
- * Strips color codes from suggestions to prevent "Illegal Characters" disconnect.
+ * Dynamic Tab Completer for PW.
+ * Uses the internal Warp ID (clean text) to provide real-time suggestions without kicks.
  */
 public class PWTabCompleter implements TabCompleter {
 
@@ -33,16 +33,18 @@ public class PWTabCompleter implements TabCompleter {
         String cmdName = command.getName().toLowerCase();
         String currentArg = args[args.length - 1].toLowerCase();
 
+        // Commands that require warp ID suggestions
         List<String> warpCommands = Arrays.asList("pw", "pwedit", "pweditplayer", "pwsetname", "pwsetlore", "pwseticon", "pwdel", "pwreset");
 
         if (warpCommands.contains(cmdName) && args.length == 1) {
+            // Access the real-time memory map of WarpManager
             completions.addAll(plugin.getWarpManager().getWarps().stream()
-                    // NEW: Strip color codes from the name before suggesting it in chat
-                    .map(w -> w.getName().replaceAll("(?i)&[0-9A-FK-OR]", ""))
-                    .filter(name -> name.toLowerCase().startsWith(currentArg))
+                    .map(Warp::getId) // Always suggest the clean ID
+                    .filter(id -> id.startsWith(currentArg))
                     .collect(Collectors.toList()));
         }
 
+        // Confirmation argument for deletion
         if (cmdName.equals("pwdel") && args.length == 2) {
             if ("confirm".startsWith(currentArg)) completions.add("confirm");
         }
