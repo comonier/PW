@@ -14,9 +14,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /*
- * Updated PWCommand.
- * Opens the Warp List immediately for better user experience.
- * Includes Global and Discord announcements.
+ * Handles /pw command.
+ * Fixed in v1.3: Discord Webhook now uses the clean ID to avoid any color formatting.
  */
 public class PWCommand implements CommandExecutor {
 
@@ -42,20 +41,17 @@ public class PWCommand implements CommandExecutor {
             return true;
         }
 
-        // /pw - Opens the Warp List immediately instead of the blank static menu
         if (args.length == 0) {
             warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps", 0);
             return true;
         }
 
-        // /pw <warp_name> - Teleport logic
         Warp warp = warpManager.getWarp(args[0]);
         if (warp == null) {
             player.sendMessage(plugin.getMessage("warp-not-found"));
             return true;
         }
 
-        // Safety check for location protection
         if (!protectionManager.isLocationStillSafe(warp.getOwnerName(), warp.getLocation())) {
             if (!warp.isLocked()) {
                 warp.setLocked(true);
@@ -65,20 +61,17 @@ public class PWCommand implements CommandExecutor {
             return true;
         }
 
-        // Check if warp is locked
         if (warp.isLocked() && !warp.getOwnerUUID().equals(player.getUniqueId()) && !player.hasPermission("pw.admin")) {
             player.sendMessage(plugin.getMessage("warp-locked-error"));
             return true;
         }
 
-        // Teleport player
         player.teleport(warp.getLocation());
         warp.addVisit();
         warpManager.saveWarp(warp);
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         player.sendMessage(plugin.getMessage("warp-teleport").replace("{warp}", warp.getName()));
 
-        // Announcements
         if (plugin.getConfig().getBoolean("announcements.global-chat")) {
             Bukkit.broadcastMessage(plugin.getMessage("broadcast-teleport")
                     .replace("{player}", player.getName())
@@ -87,9 +80,11 @@ public class PWCommand implements CommandExecutor {
 
         if (plugin.getConfig().getBoolean("announcements.discord.enabled")) {
             String title = plugin.getMessage("discord-teleport-title");
+            // Fixed: Use warp.getId() to send ONLY the clean name to Discord
             String desc = plugin.getMessage("discord-teleport-desc")
                     .replace("{player}", player.getName())
-                    .replace("{warp}", warp.getName());
+                    .replace("{warp}", warp.getId());
+            
             sendDiscordNotice(title, desc, 3447003);
         }
 
@@ -98,10 +93,18 @@ public class PWCommand implements CommandExecutor {
 
     private void sendDiscordNotice(String title, String desc, int color) {
         String url = plugin.getConfig().getString("announcements.discord.webhook-url");
-        if (url == null || url.isEmpty() || url.contains("your-link-here")) return;
+        if (url == null || url.isEmpty() || url.length() < 10) return;
         
-        String json = "{\"username\":\"" + plugin.getConfig().getString("announcements.discord.username") + "\","
-                + "\"embeds\":[{\"title\":\"" + title + "\",\"description\":\"" + desc + "\",\"color\":" + color + "}]}";
+        String username = plugin.getConfig().getString("announcements.discord.username", "Player Warps");
+        String json = "{"
+                + "\"username\": \"" + username + "\","
+                + "\"embeds\": [{"
+                + "\"title\": \"" + title + "\","
+                + "\"description\": \"" + desc + "\","
+                + "\"color\": " + color
+                + "}]"
+                + "}";
+        
         DiscordWebhook.send(url, json);
     }
 }

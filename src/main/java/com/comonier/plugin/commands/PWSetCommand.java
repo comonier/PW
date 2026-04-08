@@ -17,7 +17,8 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
 
 /*
- * Handles /pwset with localized messages and Discord Webhook integration.
+ * Handles /pwset.
+ * Fixed in v1.3: Clean ID used for all announcements to prevent formatting leaks.
  */
 public class PWSetCommand implements CommandExecutor {
 
@@ -46,6 +47,7 @@ public class PWSetCommand implements CommandExecutor {
             return true;
         }
 
+        String warpId = args[0].toLowerCase();
         int limit = getWarpLimit(player);
         if (warpManager.getPlayerWarps(player.getUniqueId()).size() >= limit && !player.hasPermission("pw.admin")) {
             player.sendMessage(plugin.getMessage("limit-reached").replace("{limit}", String.valueOf(limit)));
@@ -62,8 +64,7 @@ public class PWSetCommand implements CommandExecutor {
             return true;
         }
 
-        String warpName = args[0];
-        if (warpManager.getWarp(warpName) != null) {
+        if (warpManager.getWarp(warpId) != null) {
             player.sendMessage(plugin.getMessage("warp-exists"));
             return true;
         }
@@ -75,26 +76,25 @@ public class PWSetCommand implements CommandExecutor {
             icon.setItemMeta(meta);
         }
 
-        Warp newWarp = new Warp(warpName, player.getUniqueId(), player.getName(), player.getLocation(), icon);
+        Warp newWarp = new Warp(warpId, player.getUniqueId(), player.getName(), player.getLocation(), icon);
         warpManager.createWarp(newWarp);
 
-        player.sendMessage(plugin.getMessage("warp-created").replace("{warp}", warpName));
+        player.sendMessage(plugin.getMessage("warp-created").replace("{warp}", warpId));
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
-        // Global Broadcast
         if (plugin.getConfig().getBoolean("announcements.global-chat")) {
             Bukkit.broadcastMessage(plugin.getMessage("broadcast-create")
                     .replace("{player}", player.getName())
-                    .replace("{warp}", warpName));
+                    .replace("{warp}", warpId));
         }
 
-        // Discord Webhook
         if (plugin.getConfig().getBoolean("announcements.discord.enabled")) {
             String title = plugin.getMessage("discord-announcement-title");
+            // Fixed: Always use warpId (clean) for Discord
             String desc = plugin.getMessage("discord-announcement-desc")
                     .replace("{player}", player.getName())
-                    .replace("{warp}", warpName);
-            sendDiscordNotice(title, desc, plugin.getConfig().getInt("announcements.discord.color"));
+                    .replace("{warp}", warpId);
+            sendDiscordNotice(title, desc, 65280);
         }
 
         return true;
@@ -102,10 +102,8 @@ public class PWSetCommand implements CommandExecutor {
 
     private void sendDiscordNotice(String title, String desc, int color) {
         String url = plugin.getConfig().getString("announcements.discord.webhook-url");
-        if (url == null || url.isEmpty() || url.contains("your-link-here")) return;
-        
-        String json = "{\"username\":\"" + plugin.getConfig().getString("announcements.discord.username") + "\","
-                + "\"embeds\":[{\"title\":\"" + title + "\",\"description\":\"" + desc + "\",\"color\":" + color + "}]}";
+        if (url == null || url.isEmpty() || url.length() < 10) return;
+        String json = "{\"username\":\"" + plugin.getConfig().getString("announcements.discord.username") + "\",\"embeds\":[{\"title\":\"" + title + "\",\"description\":\"" + desc + "\",\"color\":" + color + "}]}";
         DiscordWebhook.send(url, json);
     }
 
@@ -113,12 +111,11 @@ public class PWSetCommand implements CommandExecutor {
         if (player.hasPermission("pw.limit.*") || player.isOp()) return 999;
         int max = plugin.getConfig().getInt("settings.default-warp-limit", 5);
         for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
-            String perm = pai.getPermission().toLowerCase();
-            if (perm.startsWith("pw.limit.")) {
+            if (pai.getPermission().startsWith("pw.limit.")) {
                 try {
-                    int val = Integer.parseInt(perm.replace("pw.limit.", ""));
+                    int val = Integer.parseInt(pai.getPermission().replace("pw.limit.", ""));
                     if (val > max) max = val;
-                } catch (NumberFormatException ignored) {}
+                } catch (Exception ignored) {}
             }
         }
         return max;
