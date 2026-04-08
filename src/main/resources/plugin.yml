@@ -5,6 +5,7 @@ api-version: 1.19
 author: Comonier
 description: Dynamic Player Warps system with GUI and Bedrock support.
 depend: [Vault]
+softdepend: [WorldGuard, GriefPrevention, RedProtect]
 
 commands:
   pw:

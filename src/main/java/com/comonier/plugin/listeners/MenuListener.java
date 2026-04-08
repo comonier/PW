@@ -5,18 +5,21 @@ import com.comonier.plugin.managers.MenuManager;
 import com.comonier.plugin.managers.WarpManager;
 import com.comonier.plugin.menus.WarpListMenu;
 import com.comonier.plugin.models.Warp;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.List;
 
 /*
  * Listens to inventory clicks to handle menu navigation and actions.
- * Fixed: Now correctly loads tutorial message lists from translated files.
+ * Fixed: Supports Player filtering and maintains all tutorial/edit logic.
  */
 public class MenuListener implements Listener {
 
@@ -35,8 +38,8 @@ public class MenuListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         String title = event.getView().getTitle();
-        // Check if the inventory is part of our plugin
-        if (!title.contains("Player Warps") && !title.contains("Editando Warp")) return;
+        // Check if the inventory is part of our plugin (including player-specific lists)
+        if (!title.contains("Player Warps") && !title.contains("Editando Warp") && !title.contains("Warps de:")) return;
 
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
@@ -46,8 +49,8 @@ public class MenuListener implements Listener {
         if (clicked == null || clicked.getType().isAir()) return;
 
         // Logic for Main/List Menus
-        if (title.contains("Player Warps")) {
-            handleListMenuClick(player, slot, title);
+        if (title.contains("Player Warps") || title.contains("Warps de:")) {
+            handleListMenuClick(player, slot, title, clicked);
         } 
         // Logic for Edit Panel
         else if (title.contains("Editando Warp")) {
@@ -62,7 +65,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    private void handleListMenuClick(Player player, int slot, String title) {
+    private void handleListMenuClick(Player player, int slot, String title, ItemStack clicked) {
         int currentPage = 0;
         try {
             if (title.contains("Pg ")) {
@@ -76,19 +79,31 @@ public class MenuListener implements Listener {
             warpListMenu.open(player, ownWarps, "§8Player Warps - Suas Warps", 0);
         } else if (slot == 7) { // Filter by Name
             warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Nome", 0);
-        } else if (slot == 8) { // Filter by Players
-            warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Jogadores", 0);
+        } else if (slot == 8) { // Filter by Players (Unique Owners)
+            warpListMenu.open(player, warpManager.getUniqueOwnersSorted(), "§8Player Warps - Jogadores", 0);
         } else if (slot == 45) { // Prev Page
             if (currentPage > 0) {
                 warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Nome", currentPage - 1);
             }
         } else if (slot == 53) { // Next Page
             warpListMenu.open(player, warpManager.getAllWarpsSorted(), "§8Player Warps - Nome", currentPage + 1);
-        } else if (slot > 9 && slot < 44) { // Click on a Warp icon
-            ItemStack item = player.getOpenInventory().getItem(slot);
-            if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                String warpName = item.getItemMeta().getDisplayName().substring(2); 
-                player.performCommand("pw " + warpName);
+        } else if (slot > 9 && slot < 44) { // Click on a Warp icon or Player Head
+            if (title.contains("Jogadores")) {
+                // Clicked on a Player Head -> Show only their warps
+                if (clicked.getItemMeta() instanceof SkullMeta) {
+                    SkullMeta meta = (SkullMeta) clicked.getItemMeta();
+                    if (meta.getOwningPlayer() != null) {
+                        OfflinePlayer target = meta.getOwningPlayer();
+                        List<Warp> targetWarps = warpManager.getPlayerWarps(target.getUniqueId());
+                        warpListMenu.open(player, targetWarps, "§8Warps de: " + target.getName(), 0);
+                    }
+                }
+            } else {
+                // Clicked on a Warp Icon -> Teleport
+                if (clicked.hasItemMeta() && clicked.getItemMeta().hasDisplayName()) {
+                    String warpName = clicked.getItemMeta().getDisplayName().substring(2); 
+                    player.performCommand("pw " + warpName);
+                }
             }
         }
     }
@@ -143,7 +158,7 @@ public class MenuListener implements Listener {
      */
     private void sendTutorial(Player player, String key, String warpName) {
         List<String> lines = plugin.getMessageList(key);
-        if (lines != null && !lines.isEmpty()) {
+        if (lines != null && lines.size() > 0) {
             for (String line : lines) {
                 player.sendMessage(line);
             }

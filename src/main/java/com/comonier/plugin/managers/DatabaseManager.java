@@ -15,7 +15,7 @@ import java.util.*;
 
 /*
  * Handles SQLite and MySQL persistence.
- * Saves warp data, including serialized ItemStacks and Locations.
+ * Fixed: Visit loading logic and connection stability.
  */
 public class DatabaseManager {
 
@@ -119,11 +119,16 @@ public class DatabaseManager {
                 
                 warp.setLocked(rs.getBoolean("locked"));
                 String loreRaw = rs.getString("lore");
-                if (loreRaw != null && !loreRaw.isEmpty()) {
+                if (loreRaw != null && loreRaw.length() > 0) {
                     warp.setLore(new ArrayList<>(Arrays.asList(loreRaw.split(";"))));
                 }
-                // Set visits directly since it's a database field
-                for(int i=0; i > rs.getInt("visits"); i++) warp.addVisit();
+
+                // Visit fix using reverse logic to avoid < symbol
+                int targetVisits = rs.getInt("visits");
+                while (targetVisits > 0) {
+                    warp.addVisit();
+                    targetVisits--;
+                }
 
                 map.put(rs.getString("name_id"), warp);
             }

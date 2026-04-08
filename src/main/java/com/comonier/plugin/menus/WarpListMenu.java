@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- * Updated WarpListMenu.
- * Logic fixed: Free slots (White) and Locked slots (Red) only appear in Personal Warp Menu.
- * Overload method added to fix compilation error with createItem.
+ * Paginated Menu for listing Warps or Players.
+ * Handles different view modes based on the inventory title.
  */
 public class WarpListMenu {
 
@@ -42,83 +41,58 @@ public class WarpListMenu {
 
         int itemsPerPage = availableSlots.size();
         int startIndex = page * itemsPerPage;
-        int playerLimit = getWarpLimit(player);
         
-        // Check if this is the Personal Menu
         boolean isPersonalMenu = title.contains("Suas Warps");
+        boolean isPlayerFilter = title.contains("Jogadores");
 
         for (int i = 0; i < itemsPerPage; i++) {
             int warpIndex = startIndex + i;
             int slot = availableSlots.get(i);
 
             if (warpIndex < warps.size()) {
-                inv.setItem(slot, formatWarpIcon(warps.get(warpIndex)));
+                Warp w = warps.get(warpIndex);
+                if (isPlayerFilter) {
+                    inv.setItem(slot, formatPlayerHead(w));
+                } else {
+                    inv.setItem(slot, formatWarpIcon(w));
+                }
             } 
             else if (isPersonalMenu) {
+                int playerLimit = getWarpLimit(player);
                 if (warpIndex < playerLimit) {
-                    inv.setItem(slot, createItem(Material.WHITE_STAINED_GLASS_PANE, "&fWarp " + (warpIndex + 1), List.of("&eEspaço Livre")));
+                    inv.setItem(slot, createItem(Material.WHITE_STAINED_GLASS_PANE, "&fWarp Disponível", List.of("&eSlot Livre")));
                 } else {
-                    inv.setItem(slot, createItem(Material.RED_STAINED_GLASS_PANE, "&cSlot Trancado", List.of("&7Sem permissão de limite.")));
+                    inv.setItem(slot, createItem(Material.RED_STAINED_GLASS_PANE, "&cSlot Trancado", List.of("&7Limite atingido.")));
                 }
             }
         }
 
-        // Navigation
+        // Navigation logic
         if (page > 0) {
-            inv.setItem(45, createItem(
-                Material.valueOf(plugin.getConfig().getString("navigation.previous-page-material")), 
-                plugin.getMessage("gui-previous-page-name"), 
-                plugin.getMessageList("gui-previous-page-lore")
-            ));
+            inv.setItem(45, createItem(Material.ARROW, "§aPágina Anterior"));
         }
         
-        boolean hasMoreWarps = warps.size() > (startIndex + itemsPerPage);
-        boolean hasMorePersonalSlots = isPersonalMenu && (playerLimit > (startIndex + itemsPerPage));
-
-        if (hasMoreWarps || hasMorePersonalSlots) {
-            inv.setItem(53, createItem(
-                Material.valueOf(plugin.getConfig().getString("navigation.next-page-material")), 
-                plugin.getMessage("gui-next-page-name"), 
-                plugin.getMessageList("gui-next-page-lore")
-            ));
+        if (warps.size() > (startIndex + itemsPerPage)) {
+            inv.setItem(53, createItem(Material.ARROW, "§aPróxima Página"));
         }
 
         setupStaticButtons(inv, player);
         player.openInventory(inv);
     }
 
-    private int getWarpLimit(Player player) {
-        if (player.hasPermission("pw.limit.*") || player.hasPermission("pw.admin") || player.isOp()) return 999;
-        int max = plugin.getConfig().getInt("settings.default-warp-limit", 5);
-        for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
-            String perm = pai.getPermission().toLowerCase();
-            if (perm.startsWith("pw.limit.")) {
-                try {
-                    int val = Integer.parseInt(perm.replace("pw.limit.", ""));
-                    if (val > max) max = val;
-                } catch (NumberFormatException ignored) {}
-            }
-        }
-        return max;
-    }
-
-    private void applyBorders(Inventory inv) {
-        ItemStack black = createItem(Material.BLACK_STAINED_GLASS_PANE, " ");
-        int[] fillers = {1, 2, 3, 4, 5, 6, 9, 17, 18, 26, 27, 35, 36, 44, 46, 47, 48, 49, 50, 51, 52};
-        for (int s : fillers) inv.setItem(s, black);
-    }
-
-    private void setupStaticButtons(Inventory inv, Player player) {
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) head.getItemMeta();
+    private ItemStack formatPlayerHead(Warp warp) {
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
         if (meta != null) {
-            meta.setOwningPlayer(player);
-            meta.setDisplayName("§aSuas Warps");
-            head.setItemMeta(meta);
+            meta.setOwningPlayer(Bukkit.getOfflinePlayer(warp.getOwnerUUID()));
+            meta.setDisplayName("§eDono: §f" + warp.getOwnerName());
+            List<String> lore = new ArrayList<>();
+            lore.add("§7Clique para ver todas as");
+            lore.add("§7warps deste jogador.");
+            meta.setLore(lore);
+            item.setItemMeta(meta);
         }
-        inv.setItem(0, head);
-        inv.setItem(7, createItem(Material.COMPASS, "&bBusca por WarpName"));
-        inv.setItem(8, createItem(Material.PLAYER_HEAD, "&eBusca por Jogadores"));
+        return item;
     }
 
     private ItemStack formatWarpIcon(Warp warp) {
@@ -141,28 +115,50 @@ public class WarpListMenu {
         return item;
     }
 
-    // Main createItem method
+    private void applyBorders(Inventory inv) {
+        ItemStack black = createItem(Material.BLACK_STAINED_GLASS_PANE, " ");
+        int[] fillers = {1, 2, 3, 4, 5, 6, 9, 17, 18, 26, 27, 35, 36, 44, 46, 47, 48, 49, 50, 51, 52};
+        for (int s : fillers) inv.setItem(s, black);
+    }
+
+    private void setupStaticButtons(Inventory inv, Player player) {
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        if (meta != null) {
+            meta.setOwningPlayer(player);
+            meta.setDisplayName("§aSuas Warps");
+            head.setItemMeta(meta);
+        }
+        inv.setItem(0, head);
+        inv.setItem(7, createItem(Material.COMPASS, "§bBusca por Nome"));
+        inv.setItem(8, createItem(Material.PLAYER_HEAD, "§eBusca por Jogadores"));
+    }
+
     private ItemStack createItem(Material mat, String name, List<String> lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(name.replace("&", "§"));
-            if (lore != null) {
-                meta.setLore(lore.stream().map(s -> s.replace("&", "§")).collect(Collectors.toList()));
-            }
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            try {
-                meta.addItemFlags(ItemFlag.valueOf("HIDE_ADDITIONAL_TOOLTIP"));
-            } catch (Exception ignored) {
-                meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-            }
+            if (lore != null) meta.setLore(lore.stream().map(s -> s.replace("&", "§")).collect(Collectors.toList()));
             item.setItemMeta(meta);
         }
         return item;
     }
 
-    // Overload createItem method to prevent compilation errors
-    private ItemStack createItem(Material mat, String name) {
-        return createItem(mat, name, null);
+    private ItemStack createItem(Material mat, String name) { return createItem(mat, name, null); }
+
+    private int getWarpLimit(Player player) {
+        if (player.hasPermission("pw.limit.*") || player.isOp()) return 999;
+        int max = plugin.getConfig().getInt("settings.default-warp-limit", 5);
+        for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
+            String perm = pai.getPermission().toLowerCase();
+            if (perm.startsWith("pw.limit.")) {
+                try {
+                    int val = Integer.parseInt(perm.replace("pw.limit.", ""));
+                    if (val > max) max = val;
+                } catch (Exception ignored) {}
+            }
+        }
+        return max;
     }
 }

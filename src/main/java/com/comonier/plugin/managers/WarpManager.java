@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 /*
  * Manages all warps in memory with automatic database synchronization.
- * Sorting logic: Visits first (descending), then Creation Date (ascending).
+ * Handles sorting logic and player-based grouping for GUI filters.
  */
 public class WarpManager {
 
@@ -28,7 +28,7 @@ public class WarpManager {
     }
 
     public void saveWarp(Warp warp) {
-        // Just an alias to save existing warp data
+        // Updates existing warp data in database
         databaseManager.saveWarp(warp);
     }
 
@@ -51,7 +51,9 @@ public class WarpManager {
         return warps.values();
     }
 
-    // Main sorting logic: Most visited first, then oldest first
+    /*
+     * Main sorting logic: Most visited first, then oldest first.
+     */
     public List<Warp> getAllWarpsSorted() {
         List<Warp> sortedList = new ArrayList<>(warps.values());
         sortedList.sort((w1, w2) -> {
@@ -61,5 +63,29 @@ public class WarpManager {
             return Long.compare(w1.getCreatedAt(), w2.getCreatedAt());
         });
         return sortedList;
+    }
+
+    /*
+     * Groups all existing warps by their owners.
+     * Returns a list of "Representative Warps" (one per player) to show unique players in the GUI.
+     * Logic: For each player, we pick their most popular warp as the icon.
+     */
+    public List<Warp> getUniqueOwnersSorted() {
+        Map<UUID, Warp> uniquePlayers = new HashMap<>();
+        
+        for (Warp warp : warps.values()) {
+            UUID ownerId = warp.getOwnerUUID();
+            
+            // If we don't have this player yet, or if this current warp is more popular than the one saved
+            if (!uniquePlayers.containsKey(ownerId) || warp.getVisits() > uniquePlayers.get(ownerId).getVisits()) {
+                uniquePlayers.put(ownerId, warp);
+            }
+        }
+        
+        // Convert map back to list and sort by popularity (sum of visits of the player could be an alternative)
+        List<Warp> sortedOwners = new ArrayList<>(uniquePlayers.values());
+        sortedOwners.sort((w1, w2) -> Integer.compare(w2.getVisits(), w1.getVisits()));
+        
+        return sortedOwners;
     }
 }
