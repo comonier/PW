@@ -17,7 +17,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
 
 /*
- * Handles /pwset with limits, safety and land protection.
+ * Handles /pwset with localized messages and Discord Webhook integration.
  */
 public class PWSetCommand implements CommandExecutor {
 
@@ -81,11 +81,32 @@ public class PWSetCommand implements CommandExecutor {
         player.sendMessage(plugin.getMessage("warp-created").replace("{warp}", warpName));
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
+        // Global Broadcast
         if (plugin.getConfig().getBoolean("announcements.global-chat")) {
-            Bukkit.broadcastMessage(plugin.getMessage("broadcast-create").replace("{player}", player.getName()).replace("{warp}", warpName));
+            Bukkit.broadcastMessage(plugin.getMessage("broadcast-create")
+                    .replace("{player}", player.getName())
+                    .replace("{warp}", warpName));
+        }
+
+        // Discord Webhook
+        if (plugin.getConfig().getBoolean("announcements.discord.enabled")) {
+            String title = plugin.getMessage("discord-announcement-title");
+            String desc = plugin.getMessage("discord-announcement-desc")
+                    .replace("{player}", player.getName())
+                    .replace("{warp}", warpName);
+            sendDiscordNotice(title, desc, plugin.getConfig().getInt("announcements.discord.color"));
         }
 
         return true;
+    }
+
+    private void sendDiscordNotice(String title, String desc, int color) {
+        String url = plugin.getConfig().getString("announcements.discord.webhook-url");
+        if (url == null || url.isEmpty() || url.contains("your-link-here")) return;
+        
+        String json = "{\"username\":\"" + plugin.getConfig().getString("announcements.discord.username") + "\","
+                + "\"embeds\":[{\"title\":\"" + title + "\",\"description\":\"" + desc + "\",\"color\":" + color + "}]}";
+        DiscordWebhook.send(url, json);
     }
 
     private int getWarpLimit(Player player) {

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 /*
  * Main command /pw.
- * Now using externalized messages for all outputs.
+ * Handles teleportation with localized messages and Discord Webhook integration.
  */
 public class PWCommand implements CommandExecutor {
 
@@ -71,22 +71,31 @@ public class PWCommand implements CommandExecutor {
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         player.sendMessage(plugin.getMessage("warp-teleport").replace("{warp}", warp.getName()));
 
+        // Global Broadcast
         if (plugin.getConfig().getBoolean("announcements.global-chat")) {
             Bukkit.broadcastMessage(plugin.getMessage("broadcast-teleport")
-                .replace("{player}", player.getName())
-                .replace("{warp}", warp.getName()));
+                    .replace("{player}", player.getName())
+                    .replace("{warp}", warp.getName()));
         }
 
+        // Discord Webhook
         if (plugin.getConfig().getBoolean("announcements.discord.enabled")) {
-            sendDiscordNotice("Teleport Notice", "Player **" + player.getName() + "** traveled to warp: **" + warp.getName() + "**", 3447003);
+            String title = plugin.getMessage("discord-teleport-title");
+            String desc = plugin.getMessage("discord-teleport-desc")
+                    .replace("{player}", player.getName())
+                    .replace("{warp}", warp.getName());
+            sendDiscordNotice(title, desc, 3447003);
         }
+
         return true;
     }
 
     private void sendDiscordNotice(String title, String desc, int color) {
         String url = plugin.getConfig().getString("announcements.discord.webhook-url");
         if (url == null || url.isEmpty() || url.contains("your-link-here")) return;
-        String json = "{\"username\":\"" + plugin.getConfig().getString("announcements.discord.username") + "\",\"embeds\":[{\"title\":\"" + title + "\",\"description\":\"" + desc + "\",\"color\":" + color + "}]}";
+        
+        String json = "{\"username\":\"" + plugin.getConfig().getString("announcements.discord.username") + "\","
+                + "\"embeds\":[{\"title\":\"" + title + "\",\"description\":\"" + desc + "\",\"color\":" + color + "}]}";
         DiscordWebhook.send(url, json);
     }
 }

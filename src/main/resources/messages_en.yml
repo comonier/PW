@@ -1,10 +1,9 @@
-# English Messages
 messages:
   prefix: "&b&lPW &8» "
-  no-permission: "&cYou do not have permission: {permission} or pw.use to use this command."
-  permission-denied-admin: "&cThe permission {permission} was denied by the Administrator."
+  no-permission: "&cYou do not have permission: {permission} or pw.use."
+  permission-denied-admin: "&cThe permission {permission} was denied by the Admin."
   warp-not-found: "&cWarp not found."
-  limit-reached: "&cYou have reached your limit of {limit} warps. Upgrade your rank to create more!"
+  limit-reached: "&cYou have reached your limit of {limit} warps."
   unsafe-location: "&cThis location is not safe or allowed for a warp!"
   no-build-permission: "&cYou do not have permission (Trust/Build) in this land!"
   warp-exists: "&cA warp with this name already exists!"
@@ -14,31 +13,34 @@ messages:
   warp-locked-error: "&cThis warp is locked by the owner."
   warp-teleport: "&aYou traveled to warp &f{warp}&a."
   
-  # Global Announcements
   broadcast-create: "&b&lPW &8» &f{player} &7created warp &b/pw {warp}"
   broadcast-delete: "&b&lPW &8» &7Warp &f{warp} &7was removed by &f{player}"
   broadcast-teleport: "&b&lPW &8» &f{player} &7traveled to warp &b{warp}"
 
-  # Edition Tutorials
+  gui-previous-page-name: "&aPrevious Page"
+  gui-previous-page-lore: ["&7Click to go back"]
+  gui-next-page-name: "&aNext Page"
+  gui-next-page-lore: ["&7Click to advance"]
+  
+  discord-announcement-title: "New Warp Created!"
+  discord-announcement-desc: "Player **{player}** created a new warp: **/pw {warp}**"
+  discord-teleport-title: "Teleport Notice"
+  discord-teleport-desc: "Player **{player}** traveled to warp: **{warp}**"
+  discord-delete-title: "Warp Removed"
+  discord-delete-desc: "Player **{player}** deleted warp: **{warp}**"
+
   edit-name-tutorial:
     - "&eL1: To change the warp name, type the command below:"
     - "&eL2: &b/pwsetname <old_warpname> <new_warpname>"
-    - "&eL3: &7old_warpname is the current warp name"
-    - "&eL4: &7new_warpname is the new warp name"
     - "&eL5: &8Permission: pw.setname"
-  
   edit-lore-tutorial:
     - "&eL1: To change the warp lore, type the command below:"
     - "&eL2: &b/pwsetlore <warp_name> <formatted message>"
-    - "&eL3: &7You can use color codes, example: &7/pw &bxp"
-    - "&eL4: &7You can set other lines using , or ;"
     - "&eL5: &8Permission: pw.setlore"
-
   edit-icon-tutorial:
     - "&eL1: To change the warp icon, type the command below:"
-    - "&eL2: &b/pwseticon <warp_name> &7holding an item in hand"
+    - "&eL2: &b/pwseticon <warp_name> &7holding an item"
     - "&eL3: &8Permission: pw.seticon"
-
   edit-remove-tutorial:
     - "&eL1: To remove your warp, type the command below:"
     - "&eL2: &c/pwdel <warp_name> confirm"

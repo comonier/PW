@@ -1,10 +1,9 @@
-# Mensagens em Português
 messages:
   prefix: "&b&lPW &8» "
-  no-permission: "&cVocê não possui a permissão: {permission} ou pw.use para usar este comando."
+  no-permission: "&cVocê não possui a permissão: {permission} ou pw.use."
   permission-denied-admin: "&cA permissão {permission} foi negada pelo Administrador."
   warp-not-found: "&cWarp não encontrada."
-  limit-reached: "&cVocê atingiu o seu limite de {limit} warps. Adquira um plano superior para criar mais!"
+  limit-reached: "&cVocê atingiu o seu limite de {limit} warps."
   unsafe-location: "&cEste local não é seguro ou permitido para uma warp!"
   no-build-permission: "&cVocê não possui permissão (Trust/Build) neste terreno!"
   warp-exists: "&cUma warp com este nome já existe!"
@@ -14,31 +13,34 @@ messages:
   warp-locked-error: "&cEsta warp está trancada pelo dono."
   warp-teleport: "&aVocê viajou para a warp &f{warp}&a."
   
-  # Anúncios Globais
   broadcast-create: "&b&lPW &8» &f{player} &7criou a warp &b/pw {warp}"
   broadcast-delete: "&b&lPW &8» &7A warp &f{warp} &7foi removida por &f{player}"
   broadcast-teleport: "&b&lPW &8» &f{player} &7viajou para a warp &b{warp}"
 
-  # Tutoriais de Edição
+  gui-previous-page-name: "&aPágina Anterior"
+  gui-previous-page-lore: ["&7Clique para voltar"]
+  gui-next-page-name: "&aPróxima Página"
+  gui-next-page-lore: ["&7Clique para avançar"]
+  
+  discord-announcement-title: "Nova Warp Criada!"
+  discord-announcement-desc: "O jogador **{player}** criou uma nova warp: **/pw {warp}**"
+  discord-teleport-title: "Teleporte Efetuado"
+  discord-teleport-desc: "O jogador **{player}** viajou para a warp: **{warp}**"
+  discord-delete-title: "Warp Removida"
+  discord-delete-desc: "O jogador **{player}** deletou a warp: **{warp}**"
+
   edit-name-tutorial:
     - "&eL1: Para trocar o nome da warp digite o comando abaixo:"
     - "&eL2: &b/pwsetname <old_warpname> <new_warpname>"
-    - "&eL3: &7old_warpname é o nome atual da warp"
-    - "&eL4: &7new_warpname é o novo nome da warp"
     - "&eL5: &8Permissão: pw.setname"
-  
   edit-lore-tutorial:
     - "&eL1: Para trocar a lore da warp digite o comando abaixo:"
     - "&eL2: &b/pwsetlore <warp_name> <mensagem formatada>"
-    - "&eL3: &7Você pode usar formatação de cor, exemplo: &7/pw &bxp"
-    - "&eL4: &7Você pode configurar outras linhas usando , ou ;"
     - "&eL5: &8Permissão: pw.setlore"
-
   edit-icon-tutorial:
     - "&eL1: Para trocar o icone da warp digite o comando abaixo:"
     - "&eL2: &b/pwseticon <warp_name> &7segurando um item na mão"
     - "&eL3: &8Permissão: pw.seticon"
-
   edit-remove-tutorial:
     - "&eL1: Para remover sua warp digite o comando abaixo:"
     - "&eL2: &c/pwdel <warp_name> confirm"

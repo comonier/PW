@@ -15,10 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
- * Handles the Paginated GUI for Warp Listings (Slots 10 to 43).
- * Dynamically calculates locked slots based on player's pw.limit.<number> permission.
- */
 public class WarpListMenu {
 
     private final PW plugin;
@@ -32,7 +28,6 @@ public class WarpListMenu {
         
         applyBorders(inv);
 
-        // Get the available slots in the grid (10 to 43, skipping borders)
         List<Integer> availableSlots = new ArrayList<>();
         for (int i = 10; i < 44; i++) {
             if (i % 9 == 0 || (i + 1) % 9 == 0) continue;
@@ -47,31 +42,32 @@ public class WarpListMenu {
             int warpIndex = startIndex + i;
             int slot = availableSlots.get(i);
 
-            // 1. If there is a warp at this index, show it
             if (warpIndex < warps.size()) {
                 inv.setItem(slot, formatWarpIcon(warps.get(warpIndex)));
             } 
-            // 2. If no warp, check if the slot is within player's creation limit
             else {
                 if (warpIndex < playerLimit) {
-                    // Space available for creation
                     inv.setItem(slot, createItem(Material.WHITE_STAINED_GLASS_PANE, "&fWarp " + (warpIndex + 1), List.of("&eEspaço Livre")));
                 } else {
-                    // Slot locked by permission
-                    inv.setItem(slot, createItem(Material.RED_STAINED_GLASS_PANE, "&cSlot Trancado", List.of("&7Você não possui permissão", "&7para este limite de warps.")));
+                    inv.setItem(slot, createItem(Material.RED_STAINED_GLASS_PANE, "&cSlot Trancado", List.of("&7Sem permissão de limite.")));
                 }
             }
         }
 
-        // Navigation
+        // Navigation using migrated messages
         if (page > 0) {
-            inv.setItem(45, createItem(Material.ARROW, "&aPágina Anterior"));
+            inv.setItem(45, createItem(
+                Material.valueOf(plugin.getConfig().getString("navigation.previous-page-material")), 
+                plugin.getMessage("gui-previous-page-name"), 
+                plugin.getMessageList("gui-previous-page-lore")
+            ));
         }
         if (warps.size() > (startIndex + itemsPerPage) || (startIndex + itemsPerPage) < playerLimit) {
-            // Show next page if there are more warps OR if there are still free slots to show
-            if (playerLimit > (startIndex + itemsPerPage) || warps.size() > (startIndex + itemsPerPage)) {
-                inv.setItem(53, createItem(Material.ARROW, "&aPróxima Página"));
-            }
+            inv.setItem(53, createItem(
+                Material.valueOf(plugin.getConfig().getString("navigation.next-page-material")), 
+                plugin.getMessage("gui-next-page-name"), 
+                plugin.getMessageList("gui-next-page-lore")
+            ));
         }
 
         setupStaticButtons(inv, player);
@@ -80,7 +76,6 @@ public class WarpListMenu {
 
     private int getWarpLimit(Player player) {
         if (player.hasPermission("pw.limit.*") || player.hasPermission("pw.admin") || player.isOp()) return 999;
-        
         int max = plugin.getConfig().getInt("settings.default-warp-limit", 5);
         for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
             String perm = pai.getPermission().toLowerCase();

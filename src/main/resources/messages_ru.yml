@@ -1,54 +1,44 @@
-# Русские сообщения
 messages:
   prefix: "&b&lPW &8» "
   no-permission: "&cУ вас нет разрешения: {permission} или pw.use."
-  permission-denied-admin: "&cРазрешение {permission} было отклонено администратором."
+  permission-denied-admin: "&cРазрешение {permission} было отклонено."
   warp-not-found: "&cВарп не найден."
-  limit-reached: "&cВы достигли лимита в {limit} варпов. Повысьте статус!"
-  unsafe-location: "&cЭто место небезопасно или недоступно для варпа!"
-  no-build-permission: "&cУ вас нет прав на строительство в этом регионе!"
+  limit-reached: "&cВы достигли лимита в {limit} варпов."
+  unsafe-location: "&cЭто место небезопасно для варпа!"
+  no-build-permission: "&cУ вас нет прав на строительство здесь!"
   warp-exists: "&cВарп с таким именем уже существует!"
   warp-created: "&aВарп '&f{warp}&a' успешно создан!"
   warp-deleted: "&aВарп успешно удален."
-  warp-auto-locked: "&cВарп заблокирован: Регион удален или место небезопасно."
+  warp-auto-locked: "&cВарп заблокирован: Место небезопасно."
   warp-locked-error: "&cЭтот варп заблокирован владельцем."
-  warp-teleport: "&aВы телепортировались на варп &f{warp}&a."
+  warp-teleport: "&aВы отправились на варп &f{warp}&a."
   
-  # Глобальные объявления
   broadcast-create: "&b&lPW &8» &f{player} &7создал варп &b/pw {warp}"
   broadcast-delete: "&b&lPW &8» &7Варп &f{warp} &7был удален игроком &f{player}"
   broadcast-teleport: "&b&lPW &8» &f{player} &7отправился на варп &b{warp}"
 
-  # Обучение редактированию
-  edit-name-tutorial:
-    - "&eL1: Чтобы изменить название варпа, введите команду:"
-    - "&eL2: &b/pwsetname <старое_имя> <новое_имя>"
-    - "&eL3: &7старое_имя - текущее название"
-    - "&eL4: &7новое_имя - новое название"
-    - "&eL5: &8Разрешение: pw.setname"
+  gui-previous-page-name: "&aПредыдущая страница"
+  gui-previous-page-lore: ["&7Нажмите, чтобы вернуться"]
+  gui-next-page-name: "&aСледующая страница"
+  gui-next-page-lore: ["&7Нажмите, чтобы перейти дальше"]
   
-  edit-lore-tutorial:
-    - "&eL1: Чтобы изменить описание, введите команду:"
-    - "&eL2: &b/pwsetlore <имя_варпа> <текст>"
-    - "&eL3: &7Вы можете использовать цветовые коды, например: &7/pw &bxp"
-    - "&eL4: &7Вы можете добавить новые строки через , или ;"
-    - "&eL5: &8Разрешение: pw.setlore"
+  discord-announcement-title: "Создан новый варп!"
+  discord-announcement-desc: "Игрок **{player}** создал новый варп: **/pw {warp}**"
+  discord-teleport-title: "Телепортация"
+  discord-teleport-desc: "Игрок **{player}** отправился на варп: **{warp}**"
+  discord-delete-title: "Варп удален"
+  discord-delete-desc: "Игрок **{player}** удалил варп: **{warp}**"
 
-  edit-icon-tutorial:
-    - "&eL1: Чтобы изменить иконку, введите команду:"
-    - "&eL2: &b/pwseticon <имя_варпа> &7держа предмет в руке"
-    - "&eL3: &8Разрешение: pw.seticon"
-
-  edit-remove-tutorial:
-    - "&eL1: Чтобы удалить варп, введите команду:"
-    - "&eL2: &c/pwdel <имя_варпа> confirm"
-    - "&eL3: &8Разрешение: pw.del"
+  edit-name-tutorial: ["&eСмена имени: /pwsetname <old> <new>"]
+  edit-lore-tutorial: ["&eСмена описания: /pwsetlore <warp> <text>"]
+  edit-icon-tutorial: ["&eСмена иконки: /pwseticon <warp>"]
+  edit-remove-tutorial: ["&eУдаление: /pwdel <warp> confirm"]
 
   success:
-    name-changed: "&aНазвание успешно изменено."
-    lore-changed: "&aОписание успешно изменено."
-    icon-changed: "&aИконка успешно изменена."
-    location-reset: "&aТочка варпа успешно обновлена."
-    warp-removed: "&aВарп успешно удален."
+    name-changed: "&aНазвание изменено."
+    lore-changed: "&aОписание изменено."
+    icon-changed: "&aИконка изменена."
+    location-reset: "&aТочка варпа обновлена."
+    warp-removed: "&aВарп удален."
     warp-locked: "&cВарп заблокирован."
     warp-unlocked: "&aВарп разблокирован."

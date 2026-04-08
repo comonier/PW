@@ -2,59 +2,33 @@
 # Compatible with 1.19, 1.20, 1.21 and 26.1+ (Folia/Paper/Spigot)
 
 settings:
-  # Default language: pt, en, es, ru
   language: "pt"
-  # Default icon when creating a warp: PLAYER_HEAD or HAND
   default-warp-icon: "PLAYER_HEAD"
-  # Default sorting: VISITS or DATE
   default-sorting: "VISITS"
-  # Teleport delay in seconds (0 to disable)
   teleport-delay: 3
-  # Default limit for all players if no specific permission is found
-  # To increase limits, give players the permission: pw.limit.<number>
-  # Example: pw.limit.10
   default-warp-limit: 5
 
-# Announcement Settings
 announcements:
-  # Send a message to the whole server when a warp is created?
   global-chat: true
-  # Discord Webhook Settings
   discord:
     enabled: false
     webhook-url: "https://discord.com"
     username: "Player Warps"
     avatar-url: "https://imgur.com"
-    # Content of the message
-    title: "Nova Warp Criada!"
-    color: 65280 # Green in decimal
+    color: 65280
 
-# Database configuration
-# Set type to SQLITE for local storage or MYSQL for external databases
 database:
-  # SQLITE or MYSQL
   type: "SQLITE"
-  # Connection details for MYSQL (only used if type is MYSQL)
   host: "localhost"
   port: "3306"
   name: "minecraft"
   user: "root"
   password: ""
 
-# Navigation buttons (Slots 45 and 53)
 navigation:
-  previous-page:
-    material: "ARROW"
-    name: "&aPágina Anterior"
-    lore:
-      - "&7Clique para voltar"
-  next-page:
-    material: "ARROW"
-    name: "&aPróxima Página"
-    lore:
-      - "&7Clique para avançar"
+  previous-page-material: "ARROW"
+  next-page-material: "ARROW"
 
-# Permissions settings
 permissions:
   use-all: "pw.use"
   admin: "pw.admin"

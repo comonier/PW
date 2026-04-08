@@ -7,12 +7,10 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-/*
- * Main class for the PW plugin.
- * Centralizes configuration, database, and multilingual messages.
- */
 public class PW extends JavaPlugin {
 
     private static PW instance;
@@ -36,7 +34,7 @@ public class PW extends JavaPlugin {
         saveResource("messages_ru.yml", false);
 
         if (!setupPermissions()) {
-            log.severe(String.format("[%s] - Vault not found!", getDescription().getName()));
+            log.severe(String.format("[%s] - Vault dependency not found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -48,18 +46,14 @@ public class PW extends JavaPlugin {
         this.menuManager = new MenuManager(this);
 
         PWTabCompleter tabCompleter = new PWTabCompleter(this);
-        
         getCommand("pw").setExecutor(new PWCommand(this, warpManager, menuManager, protectionManager));
         getCommand("pw").setTabCompleter(tabCompleter);
-        
         getCommand("pwset").setExecutor(new PWSetCommand(this, warpManager, protectionManager));
         getCommand("pwset").setTabCompleter(tabCompleter);
-        
+
         PWEditCommand editCmd = new PWEditCommand(this, warpManager, menuManager);
         getCommand("pwedit").setExecutor(editCmd);
-        getCommand("pwedit").setTabCompleter(tabCompleter);
         getCommand("pweditplayer").setExecutor(editCmd);
-        getCommand("pweditplayer").setTabCompleter(tabCompleter);
 
         PWAttributeCommands attrCmd = new PWAttributeCommands(this, warpManager, protectionManager);
         String[] attrCommands = {"pwsetname", "pwsetlore", "pwseticon", "pwdel", "pwreset"};
@@ -69,20 +63,20 @@ public class PW extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new MenuListener(this, warpManager, menuManager), this);
-        log.info(String.format("[%s] Plugin enabled version %s", getDescription().getName(), getDescription().getVersion()));
     }
 
     public String getMessage(String path) {
-        String lang = getConfig().getString("settings.language", "pt");
+        String lang = getConfig().getString("settings.language", "en");
         org.bukkit.configuration.file.FileConfiguration msgConfig = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages_" + lang + ".yml"));
         String msg = msgConfig.getString("messages." + path);
-        if (msg == null) return "§cMessage path not found: " + path;
-        return msg.replace("&", "§");
+        return (msg == null) ? "§cPath: " + path : msg.replace("&", "§");
     }
 
-    @Override
-    public void onDisable() {
-        log.info(String.format("[%s] Plugin disabled.", getDescription().getName()));
+    public List<String> getMessageList(String path) {
+        String lang = getConfig().getString("settings.language", "en");
+        org.bukkit.configuration.file.FileConfiguration msgConfig = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages_" + lang + ".yml"));
+        List<String> list = msgConfig.getStringList("messages." + path);
+        return list.stream().map(s -> s.replace("&", "§")).collect(Collectors.toList());
     }
 
     private boolean setupPermissions() {
@@ -101,10 +95,7 @@ public class PW extends JavaPlugin {
     }
 
     public static PW getInstance() { return instance; }
-    public static Permission getPermissions() { return perms; }
-    public static Chat getChat() { return chat; }
     public WarpManager getWarpManager() { return warpManager; }
     public MenuManager getMenuManager() { return menuManager; }
-    public DatabaseManager getDatabaseManager() { return databaseManager; }
     public ProtectionManager getProtectionManager() { return protectionManager; }
 }
